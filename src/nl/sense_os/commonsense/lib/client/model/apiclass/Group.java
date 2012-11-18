@@ -1,4 +1,4 @@
-package nl.sense_os.commonsense.lib.client.model;
+package nl.sense_os.commonsense.lib.client.model.apiclass;
 
 import java.util.ArrayList;
 import java.util.List;

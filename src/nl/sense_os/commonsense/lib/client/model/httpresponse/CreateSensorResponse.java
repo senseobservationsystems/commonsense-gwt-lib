@@ -1,6 +1,6 @@
-package nl.sense_os.commonsense.lib.client.communication.httpresponse;
+package nl.sense_os.commonsense.lib.client.model.httpresponse;
 
-import nl.sense_os.commonsense.lib.client.model.Sensor;
+import nl.sense_os.commonsense.lib.client.model.apiclass.Sensor;
 
 import com.google.gwt.core.client.JavaScriptObject;
 

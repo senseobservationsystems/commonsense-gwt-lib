@@ -1,22 +1,22 @@
-package nl.sense_os.commonsense.lib.client.communication.httpresponse;
+package nl.sense_os.commonsense.lib.client.model.httpresponse;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.sense_os.commonsense.lib.client.model.Service;
+import nl.sense_os.commonsense.lib.client.model.apiclass.Service;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 
-public class AvailServicesResponse extends JavaScriptObject {
+public class GetServicesResponse extends JavaScriptObject {
 
-	protected AvailServicesResponse() {
+	protected GetServicesResponse() {
 		// empty protected constructor
 	}
 
 	public final native JsArray<Service> getRawServices() /*-{
-        if (undefined != this.available_services) {
-            return this.available_services;
+        if (undefined != this.services) {
+            return this.services;
         } else {
             return [];
         }

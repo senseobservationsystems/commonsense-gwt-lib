@@ -1,6 +1,6 @@
-package nl.sense_os.commonsense.lib.client.communication.httpresponse;
+package nl.sense_os.commonsense.lib.client.model.httpresponse;
 
-import nl.sense_os.commonsense.lib.client.model.BackEndDataPoint;
+import nl.sense_os.commonsense.lib.client.model.apiclass.DataPoint;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
@@ -44,7 +44,7 @@ public class GetSensorDataResponse extends JavaScriptObject {
 	 * @return The 'data' property of the response, containing an array with sensor data. If 'data'
 	 *         is undefined, an empty array is returned.
 	 */
-	public final native JsArray<BackEndDataPoint> getData() /*-{
+	public final native JsArray<DataPoint> getData() /*-{
         if (undefined != this.data) {
             return this.data;
         } else {

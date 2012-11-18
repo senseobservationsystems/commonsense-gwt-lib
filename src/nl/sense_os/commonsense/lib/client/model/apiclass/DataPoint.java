@@ -1,13 +1,13 @@
-package nl.sense_os.commonsense.lib.client.model;
+package nl.sense_os.commonsense.lib.client.model.apiclass;
 
 import com.google.gwt.core.client.JavaScriptObject;
 
 /**
  * Class to represent the "raw" data points that are in the data that CommonSense back end sends us.
  */
-public class BackEndDataPoint extends JavaScriptObject {
+public class DataPoint extends JavaScriptObject {
 
-    protected BackEndDataPoint() {
+    protected DataPoint() {
         // empty protected constructor
     }
 

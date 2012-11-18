@@ -1,4 +1,4 @@
-package nl.sense_os.commonsense.lib.client.communication.httpresponse;
+package nl.sense_os.commonsense.lib.client.model.httpresponse;
 
 import com.google.gwt.core.client.JavaScriptObject;
 

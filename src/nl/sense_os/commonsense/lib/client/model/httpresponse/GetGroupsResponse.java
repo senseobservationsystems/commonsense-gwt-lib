@@ -1,9 +1,9 @@
-package nl.sense_os.commonsense.lib.client.communication.httpresponse;
+package nl.sense_os.commonsense.lib.client.model.httpresponse;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.sense_os.commonsense.lib.client.model.Group;
+import nl.sense_os.commonsense.lib.client.model.apiclass.Group;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
