@@ -12,7 +12,7 @@ import com.google.gwt.http.client.URL;
 import com.google.gwt.http.client.UrlBuilder;
 import com.google.gwt.user.client.Window.Location;
 
-public class CommonSenseApi {
+public class CommonSenseClient {
 
     public static class Urls {
         private static final String PATH_PREFIX = Constants.STABLE_MODE || Constants.RC_MODE
@@ -51,16 +51,16 @@ public class CommonSenseApi {
         }
     }
 
-    private static CommonSenseApi instance;
+    private static CommonSenseClient instance;
     private static final String JSON_TYPE = "application/json";
     private static final String WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
 
     /**
-     * @return A CommonSenseAPI instance, using singleton pattern
+     * @return A CommonSenseClient instance, using singleton pattern
      */
-    public static final CommonSenseApi getInstance() {
+    public static final CommonSenseClient getClient() {
         if (null != instance) {
-            instance = new CommonSenseApi();
+            instance = new CommonSenseClient();
         }
         return instance;
     }
@@ -89,7 +89,7 @@ public class CommonSenseApi {
 
     private String sessionId;
 
-    private CommonSenseApi() {
+    private CommonSenseClient() {
         // private constructor to prevent direct instantiation
     }
 
