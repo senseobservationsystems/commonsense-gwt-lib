@@ -1,8 +1,8 @@
-package nl.sense_os.commonsense.lib.client.util;
+package nl.sense_os.commonsense.lib.client.communication;
 
 import com.google.gwt.core.client.GWT;
 
-public class Constants {
+class Constants {
 
 	/**
 	 * Flag for Stable mode. <code>true</code> if the app is deployed to common.sense-os.nl.

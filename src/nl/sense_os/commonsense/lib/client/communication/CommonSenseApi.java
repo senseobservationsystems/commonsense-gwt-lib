@@ -3,7 +3,6 @@ package nl.sense_os.commonsense.lib.client.communication;
 import java.util.List;
 import java.util.Map.Entry;
 
-import nl.sense_os.commonsense.lib.client.util.Constants;
 import nl.sense_os.commonsense.lib.client.util.Md5Hasher;
 
 import com.google.gwt.http.client.RequestBuilder;

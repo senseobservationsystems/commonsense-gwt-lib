@@ -4,15 +4,8 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.logging.Logger;
 
 public class Md5Hasher {
-
-    private static final Logger logger = Logger.getLogger("Md5Hasher");
-
-    private Md5Hasher() {
-        // Private constructor to make sure this class is not instantiated.
-    }
 
     /**
      * Creates an MD5 hash of a String, for hashing the password before sending it.
@@ -35,10 +28,14 @@ public class Md5Hasher {
                 hashed = "0" + hashed;
             }
         } catch (UnsupportedEncodingException e) {
-            logger.severe("UnsupportedEncodingException hashing password: " + e.getMessage());
+            hashed = null;
         } catch (NoSuchAlgorithmException e) {
-            logger.severe("NoSuchAlgorithmException hashing password: " + e.getMessage());
+            hashed = null;
         }
         return hashed;
+    }
+
+    private Md5Hasher() {
+        // Private constructor to make sure this class is not instantiated.
     }
 }
