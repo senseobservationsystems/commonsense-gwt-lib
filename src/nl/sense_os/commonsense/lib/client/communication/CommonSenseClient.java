@@ -59,7 +59,7 @@ public class CommonSenseClient {
      * @return A CommonSenseClient instance, using singleton pattern
      */
     public static final CommonSenseClient getClient() {
-        if (null != instance) {
+        if (null == instance) {
             instance = new CommonSenseClient();
         }
         return instance;
