@@ -155,6 +155,26 @@ public class CommonSenseClient {
         sendRequest(method, url, sessionId, data, callback);
     }
 
+    public void checkUsernameAvailability(RequestCallback callback, String username) {
+
+        // prepare request
+        Method httpMethod = RequestBuilder.GET;
+        String url = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
+                .setPath(Urls.PATH_USERS + "/check/username/" + username).buildString();
+
+        sendRequest(httpMethod, url, null, null, callback);
+    }
+
+    public void checkEmailAvailability(RequestCallback callback, String email) {
+
+        // prepare request
+        Method httpMethod = RequestBuilder.GET;
+        String url = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
+                .setPath(Urls.PATH_USERS + "/check/email/" + email).buildString();
+
+        sendRequest(httpMethod, url, null, null, callback);
+    }
+
     public void createUser(RequestCallback callback, String username, String password, String name,
             String surname, String phone, String email, String country, Boolean disableMail) {
 
