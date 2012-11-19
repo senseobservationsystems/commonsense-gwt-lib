@@ -350,9 +350,9 @@ public class CommonSenseClient {
      * @param next
      * @param last
      */
-    public void getSensorData(RequestCallback callback, String sensorId, String startDate,
-            String endDate, String date, String perPage, String page, String interval, String next,
-            String last, String sort) {
+    public void getSensorData(RequestCallback callback, String sensorId, Long startDate,
+            Long endDate, Long date, Integer perPage, Integer page, Integer interval, Boolean next,
+            Boolean last, String sort) {
 
         // check if there is a session ID
         if (null == sessionId) {
@@ -365,28 +365,32 @@ public class CommonSenseClient {
         UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
                 .setPath(Urls.PATH_SENSOR_DATA.replace("%1", sensorId));
         if (null != startDate) {
-            urlBuilder.setParameter("start_date", startDate);
+            String dateString = NumberFormat.getFormat("#.000").format(
+                    startDate.longValue() / 1000d);
+            urlBuilder.setParameter("start_date", dateString);
         }
         if (null != endDate) {
-            urlBuilder.setParameter("end_date", endDate);
+            String dateString = NumberFormat.getFormat("#.000").format(endDate.longValue() / 1000d);
+            urlBuilder.setParameter("end_date", dateString);
         }
         if (null != date) {
-            urlBuilder.setParameter("date", date);
+            String dateString = NumberFormat.getFormat("#.000").format(date.longValue() / 1000d);
+            urlBuilder.setParameter("date", dateString);
         }
         if (null != perPage) {
-            urlBuilder.setParameter("per_page", perPage);
+            urlBuilder.setParameter("per_page", perPage.toString());
         }
         if (null != page) {
-            urlBuilder.setParameter("page", page);
+            urlBuilder.setParameter("page", page.toString());
         }
         if (null != interval) {
-            urlBuilder.setParameter("interval", interval);
+            urlBuilder.setParameter("interval", interval.toString());
         }
         if (null != last) {
-            urlBuilder.setParameter("last", last);
+            urlBuilder.setParameter("last", last ? "1" : "0");
         }
         if (null != next) {
-            urlBuilder.setParameter("next", next);
+            urlBuilder.setParameter("next", next ? "1" : "0");
         }
         if (null != sort) {
             urlBuilder.setParameter("sort", sort);
