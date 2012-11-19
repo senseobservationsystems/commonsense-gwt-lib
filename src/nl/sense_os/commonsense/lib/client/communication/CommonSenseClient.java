@@ -24,6 +24,7 @@ public class CommonSenseClient {
         public static final String PROTOCOL = "http";
 
         // main paths
+        public static final String PATH_DOMAINS = PATH_PREFIX + "domains";
         public static final String PATH_SENSORS = PATH_PREFIX + "sensors";
         public static final String PATH_GROUPS = PATH_PREFIX + "groups";
         public static final String PATH_USERS = PATH_PREFIX + "users";
@@ -33,6 +34,9 @@ public class CommonSenseClient {
         public static final String PATH_LOGOUT = PATH_PREFIX + "logout";
         public static final String PATH_PW_RESET = PATH_PREFIX + "resetPassword";
         public static final String PATH_FORGOT_PASSWORD = PATH_PREFIX + "requestPasswordReset";
+
+        // domains paths
+        public static final String PATH_DOMAIN_USERS = PATH_DOMAINS + "/users";
 
         // sensors paths
         public static final String PATH_AVAIL_SERVICES = PATH_SENSORS + "/services/available";
@@ -92,6 +96,38 @@ public class CommonSenseClient {
 
     private CommonSenseClient() {
         // private constructor to prevent direct instantiation
+    }
+
+    public void addDomainUser(RequestCallback callback, String domainId, String userId,
+            String username) {
+
+        // check if there is a session ID
+        if (null == sessionId) {
+            callback.onError(null, new Exception("Not logged in"));
+            return;
+        }
+
+        // prepare request properties
+        Method method = RequestBuilder.POST;
+        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
+                .setPath(Urls.PATH_DOMAIN_USERS);
+        String url = urlBuilder.buildString();
+
+        // prepare request data
+        String user = "";
+        if (null != userId && null != username) {
+            user = "{\"id\":\"" + userId + "\",\"username\":\"" + username + "\"}";
+        } else if (null != userId) {
+            user = "{\"id\":\"" + userId + "\"}";
+        } else if (null != username) {
+            user = "{\"username\":\"" + username + "\"}";
+        } else {
+            callback.onError(null, new Throwable("Cannot find user ID or user name"));
+        }
+        String data = "{\"users\":[" + user + "]}";
+
+        // send request
+        sendRequest(method, url, sessionId, data, callback);
     }
 
     public void createSensorData(RequestCallback callback, String sensorId, String value,
