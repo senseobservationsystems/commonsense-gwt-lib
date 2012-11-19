@@ -26,8 +26,40 @@ public class DataPoint extends JavaScriptObject {
 		return '' + this.date;
     }-*/;
 
-    public final native String getValue() /*-{
+    public final native Object getValue() /*-{
 		return this.value;
+    }-*/;
+
+    public final native JavaScriptObject getJsoValue() /*-{
+		if (typeof this.value == "object") {
+			return this.value;
+		} else {
+			return {};
+		}
+    }-*/;
+
+    public final native String getStringValue() /*-{
+		if (typeof this.value == "string") {
+			return this.value;
+		} else {
+			return null;
+		}
+    }-*/;
+
+    public final native boolean getBooleanValue() /*-{
+		if (typeof this.value == "boolean") {
+			return this.value;
+		} else {
+			return false;
+		}
+    }-*/;
+
+    public final native Double getNumberValue() /*-{
+		if (typeof this.value == "number") {
+			return this.value;
+		} else {
+			return -1;
+		}
     }-*/;
 
     public final native int getWeek() /*-{
