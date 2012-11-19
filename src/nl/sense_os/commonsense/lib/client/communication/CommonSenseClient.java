@@ -18,8 +18,8 @@ public class CommonSenseClient {
         private static final String PATH_PREFIX = Constants.STABLE_MODE || Constants.RC_MODE
                 || Constants.DEV_MODE ? "api/" : "";
         public static final String HOST = Constants.STABLE_MODE ? "common.sense-os.nl"
-                : Constants.RC_MODE ? "rc.sense-os.nl" : Constants.DEV_MODE ? "common.dev.sense-os.nl"
-                        : "api.sense-os.nl";
+                : Constants.RC_MODE ? "rc.sense-os.nl"
+                        : Constants.DEV_MODE ? "common.dev.sense-os.nl" : "api.sense-os.nl";
         public static final String PROTOCOL = "http";
 
         // main paths
@@ -98,6 +98,24 @@ public class CommonSenseClient {
 
     }
 
+    public void deleteSensorData(RequestCallback callback, String sensorId, String dataId) {
+
+        // check if there is a session ID
+        if (null == sessionId) {
+            callback.onError(null, new Exception("Not logged in"));
+            return;
+        }
+
+        // prepare request properties
+        Method method = RequestBuilder.DELETE;
+        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
+                .setPath(Urls.PATH_SENSOR_DATA.replace("%1", sensorId) + "/" + dataId);
+        String url = urlBuilder.buildString();
+
+        // send request
+        sendRequest(method, url, sessionId, null, callback);
+    }
+
     public void disconnectService(RequestCallback callback, String sensorId, String serviceId) {
 
         // check if there is a session ID
@@ -108,9 +126,7 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.DELETE;
-        UrlBuilder urlBuilder = new UrlBuilder()
-                .setProtocol(Urls.PROTOCOL)
-                .setHost(Urls.HOST)
+        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
                 .setPath(Urls.PATH_SERVICE.replace("%1", sensorId).replace("%2", serviceId));
         String url = urlBuilder.buildString();
 
@@ -259,8 +275,7 @@ public class CommonSenseClient {
         sendRequest(method, url, sessionId, null, callback);
     }
 
-    public void getGroupUsers(RequestCallback callback, String groupId, String perPage,
-            String page) {
+    public void getGroupUsers(RequestCallback callback, String groupId, String perPage, String page) {
 
         // check if there is a session ID
         if (null == sessionId) {
@@ -356,8 +371,8 @@ public class CommonSenseClient {
      * @param details
      * @param groupId
      */
-    public void getSensors(RequestCallback callback, String perPage, String page,
-            String shared, String owned, String physical, String details, String groupId) {
+    public void getSensors(RequestCallback callback, String perPage, String page, String shared,
+            String owned, String physical, String details, String groupId) {
 
         // check if there is a session ID
         if (null == sessionId) {
