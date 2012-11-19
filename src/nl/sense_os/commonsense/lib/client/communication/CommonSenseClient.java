@@ -10,6 +10,7 @@ import com.google.gwt.http.client.RequestBuilder.Method;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.http.client.UrlBuilder;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Window.Location;
 
 public class CommonSenseClient {
@@ -93,9 +94,45 @@ public class CommonSenseClient {
         // private constructor to prevent direct instantiation
     }
 
-    public void deleteEnvironment(RequestCallback callback, int environmentId) {
-        // TODO Auto-generated method stub
+    public void createSensorData(RequestCallback callback, String sensorId, String value,
+            long timestamp) {
 
+        // check if there is a session ID
+        if (null == sessionId) {
+            callback.onError(null, new Exception("Not logged in"));
+            return;
+        }
+
+        // prepare request properties
+        Method method = RequestBuilder.POST;
+        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
+                .setPath(Urls.PATH_SENSOR_DATA.replace("%1", sensorId));
+        String url = urlBuilder.buildString();
+
+        // prepare request data
+        String date = NumberFormat.getFormat("#.000").format(timestamp / 1000d);
+        String data = "{\"data\":{\"value\":\"" + value + "\",\"date\":" + date + "}}";
+
+        // send request
+        sendRequest(method, url, sessionId, data, callback);
+    }
+
+    public void deleteEnvironment(RequestCallback callback, int environmentId) {
+
+        // check if there is a session ID
+        if (null == sessionId) {
+            callback.onError(null, new Exception("Not logged in"));
+            return;
+        }
+
+        // prepare request properties
+        Method method = RequestBuilder.DELETE;
+        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
+                .setPath(Urls.PATH_ENVIRONMENTS + "/" + environmentId);
+        String url = urlBuilder.buildString();
+
+        // send request
+        sendRequest(method, url, sessionId, null, callback);
     }
 
     public void deleteSensorData(RequestCallback callback, String sensorId, String dataId) {
