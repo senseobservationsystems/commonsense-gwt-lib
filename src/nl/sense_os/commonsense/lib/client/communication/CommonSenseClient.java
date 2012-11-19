@@ -509,6 +509,33 @@ public class CommonSenseClient {
         sendRequest(httpMethod, url, sessionId, data, callback);
     }
 
+    public void setServiceManualData(RequestCallback callback, String sensorId, String serviceId,
+            String value, long timestamp) {
+
+        // check if there is a session ID
+        if (null == sessionId) {
+            callback.onError(null, new Exception("Not logged in"));
+            return;
+        }
+
+        // prepare request properties
+        Method httpMethod = RequestBuilder.POST;
+        UrlBuilder urlBuilder = new UrlBuilder()
+                .setProtocol(Urls.PROTOCOL)
+                .setHost(Urls.HOST)
+                .setPath(
+                        Urls.PATH_SERVICE_METHODS.replace("%1", sensorId).replace("%2", serviceId)
+                                + "/manualData");
+        String url = urlBuilder.buildString();
+
+        // prepare request data
+        String date = NumberFormat.getFormat("#.000").format(timestamp / 1000d);
+        String data = "{\"data\":{\"date\":" + date + ",\"value\":\"" + value + "\"}}";
+
+        // send request
+        sendRequest(httpMethod, url, sessionId, data, callback);
+    }
+
     public void getServiceMethods(RequestCallback callback, String sensorId, String serviceId) {
 
         // check if there is a session ID
