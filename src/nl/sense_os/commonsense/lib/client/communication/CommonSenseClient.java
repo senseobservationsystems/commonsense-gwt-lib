@@ -11,6 +11,8 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.http.client.UrlBuilder;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONString;
 import com.google.gwt.user.client.Window.Location;
 
 public class CommonSenseClient {
@@ -148,6 +150,51 @@ public class CommonSenseClient {
         // prepare request data
         String date = NumberFormat.getFormat("#.000").format(timestamp / 1000d);
         String data = "{\"data\":{\"value\":\"" + value + "\",\"date\":" + date + "}}";
+
+        // send request
+        sendRequest(method, url, sessionId, data, callback);
+    }
+
+    public void createUser(RequestCallback callback, String username, String password, String name,
+            String surname, String phone, String email, String country, Boolean disableMail) {
+
+        // check if there is a session ID
+        if (null == sessionId) {
+            callback.onError(null, new Exception("Not logged in"));
+            return;
+        }
+
+        // prepare request properties
+        Method method = RequestBuilder.POST;
+        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
+                .setPath(Urls.PATH_USERS);
+        String url = urlBuilder.buildString();
+
+        // prepare data
+        JSONObject user = new JSONObject();
+        user.put("username", new JSONString(username));
+        user.put("password", new JSONString(Md5Hasher.hash(password)));
+        if (null != email) {
+            user.put("email", new JSONString(email));
+        }
+        if (null != name) {
+            user.put("name", new JSONString(name));
+        }
+        if (null != surname) {
+            user.put("surname", new JSONString(surname));
+        }
+        if (null != phone) {
+            user.put("phone", new JSONString(phone));
+        }
+        if (null != country) {
+            user.put("country", new JSONString(country));
+        }
+        if (null != disableMail) {
+            user.put("disable_mail", new JSONString(disableMail ? "1" : "0"));
+        }
+        JSONObject jso = new JSONObject();
+        jso.put("user", user);
+        String data = jso.toString();
 
         // send request
         sendRequest(method, url, sessionId, data, callback);
