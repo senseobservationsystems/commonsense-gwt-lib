@@ -9,7 +9,7 @@ import com.google.gwt.core.client.JsonUtils;
  */
 public class Sensor extends JavaScriptObject {
 
-    public native static final Sensor create(int id, String name, String description,
+    public native static final Sensor create(String id, String name, String description,
             String dataType) /*-{
 		return {
 			'id' : id,
@@ -81,7 +81,7 @@ public class Sensor extends JavaScriptObject {
 
     public final String serialize() {
         StringBuilder builder = new StringBuilder("{");
-        builder.append("\"id\":" + getId());
+        builder.append("\"id\":" + JsonUtils.escapeValue(getId()));
         builder.append(",\"name\":" + JsonUtils.escapeValue(getName()));
         builder.append(",\"device_type\":" + JsonUtils.escapeValue(getDescription()));
         builder.append(",\"data_type\":" + JsonUtils.escapeValue(getDataType()));

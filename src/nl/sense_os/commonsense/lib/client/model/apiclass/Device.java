@@ -26,7 +26,7 @@ public class Device extends JavaScriptObject {
 
     public final String serialize() {
         StringBuilder builder = new StringBuilder("{");
-        builder.append("\"id\":" + getId());
+        builder.append("\"id\":" + JsonUtils.escapeValue(getId()));
         builder.append(",\"type\":" + JsonUtils.escapeValue(getType()));
         builder.append(",\"uuid\":" + JsonUtils.escapeValue(getUuid()));
         builder.append("}");

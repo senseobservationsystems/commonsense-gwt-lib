@@ -66,7 +66,7 @@ public class User extends JavaScriptObject {
 
     public final String serialize() {
         StringBuilder builder = new StringBuilder("{");
-        builder.append("\"id\":" + getId());
+        builder.append("\"id\":" + JsonUtils.escapeValue(getId()));
         builder.append(",\"username\":" + JsonUtils.escapeValue(getUsername()));
         builder.append(",\"email\":" + JsonUtils.escapeValue(getEmail()));
         builder.append(",\"name\":" + JsonUtils.escapeValue(getName()));
