@@ -354,6 +354,8 @@ public class CommonSenseClient {
      * @param surname
      * @param phone
      * @param email
+     * @param address
+     * @param zipCode
      * @param country
      * @param disableMail
      */
@@ -752,8 +754,8 @@ public class CommonSenseClient {
      * @param details
      * @param groupId
      */
-    public void getSensors(RequestCallback callback, String perPage, String page, String shared,
-            String owned, String physical, String details, String groupId) {
+    public void getSensors(RequestCallback callback, Integer perPage, Integer page, Boolean shared,
+            Boolean owned, Boolean physical, String details, String groupId) {
 
         // check if there is a session ID
         if (null == sessionId) {
@@ -766,19 +768,19 @@ public class CommonSenseClient {
         UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
                 .setPath(Urls.PATH_SENSORS);
         if (null != page) {
-            urlBuilder.setParameter("page", page);
+            urlBuilder.setParameter("page", page.toString());
         }
         if (null != perPage) {
-            urlBuilder.setParameter("per_page", perPage);
+            urlBuilder.setParameter("per_page", perPage.toString());
         }
         if (null != shared) {
-            urlBuilder.setParameter("shared", shared);
+            urlBuilder.setParameter("shared", shared ? "1" : "0");
         }
         if (null != owned) {
-            urlBuilder.setParameter("owned", owned);
+            urlBuilder.setParameter("owned", owned ? "1" : "0");
         }
         if (null != physical) {
-            urlBuilder.setParameter("physical", physical);
+            urlBuilder.setParameter("physical", physical ? "1" : "0");
         }
         if (null != details) {
             urlBuilder.setParameter("details", details);
