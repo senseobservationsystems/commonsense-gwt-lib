@@ -11,6 +11,8 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.http.client.UrlBuilder;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONBoolean;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
 import com.google.gwt.user.client.Window.Location;
@@ -100,6 +102,13 @@ public class CommonSenseClient {
         // private constructor to prevent direct instantiation
     }
 
+    /**
+     * 
+     * @param callback
+     * @param domainId
+     * @param userId
+     * @param username
+     */
     public void addDomainUser(RequestCallback callback, String domainId, String userId,
             String username) {
 
@@ -132,6 +141,187 @@ public class CommonSenseClient {
         sendRequest(method, url, sessionId, data, callback);
     }
 
+    /**
+     * 
+     * @param callback
+     * @param email
+     */
+    public void checkEmailAvailability(RequestCallback callback, String email) {
+
+        // prepare request
+        Method httpMethod = RequestBuilder.GET;
+        String url = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
+                .setPath(Urls.PATH_USERS + "/check/email/" + email).buildString();
+
+        sendRequest(httpMethod, url, null, null, callback);
+    }
+
+    /**
+     * 
+     * @param callback
+     * @param username
+     */
+    public void checkUsernameAvailability(RequestCallback callback, String username) {
+
+        // prepare request
+        Method httpMethod = RequestBuilder.GET;
+        String url = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
+                .setPath(Urls.PATH_USERS + "/check/username/" + username).buildString();
+
+        sendRequest(httpMethod, url, null, null, callback);
+    }
+
+    /**
+     * 
+     * @param callback
+     * @param name
+     * @param email
+     * @param username
+     * @param password
+     * @param description
+     * @param publik
+     * @param hidden
+     * @param anonymous
+     * @param accessPassword
+     * @param requiredSensors
+     * @param optionalSensors
+     * @param defaultListUsers
+     * @param defaultAddUsers
+     * @param defaultRemoveUsers
+     * @param defaultListSensors
+     * @param defaultAddSensors
+     * @param defaultRemoveSensors
+     * @param reqShowUsername
+     * @param reqShowName
+     * @param reqShowSurname
+     * @param reqShowEmail
+     * @param reqShowMobile
+     * @param reqShowId
+     * @param reqShowZip
+     * @param reqShowAddress
+     * @param reqShowCountry
+     */
+    public void createGroup(RequestCallback callback, String name, String email, String username,
+            String password, String description, Boolean publik, Boolean hidden, Boolean anonymous,
+            String accessPassword, List<String> requiredSensors, List<String> optionalSensors,
+            Boolean defaultListUsers, Boolean defaultAddUsers, Boolean defaultRemoveUsers,
+            Boolean defaultListSensors, Boolean defaultAddSensors, Boolean defaultRemoveSensors,
+            Boolean reqShowUsername, Boolean reqShowName, Boolean reqShowSurname,
+            Boolean reqShowEmail, Boolean reqShowMobile, Boolean reqShowId, Boolean reqShowZip,
+            Boolean reqShowAddress, Boolean reqShowCountry) {
+
+        // check if there is a session ID
+        if (null == sessionId) {
+            callback.onError(null, new Exception("Not logged in"));
+            return;
+        }
+
+        // prepare request properties
+        Method method = RequestBuilder.POST;
+        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
+                .setPath(Urls.PATH_GROUPS);
+        String url = urlBuilder.buildString();
+
+        // prepare request data
+        JSONObject group = new JSONObject();
+        group.put("name", new JSONString(name));
+        if (null != email) {
+            group.put("email", new JSONString(email));
+        }
+        if (null != username) {
+            group.put("username", new JSONString(username));
+        }
+        if (null != password) {
+            String hashedPass = Md5Hasher.hash(password);
+            group.put("password", new JSONString(hashedPass));
+        }
+        if (null != description) {
+            group.put("description", new JSONString(description));
+        }
+        if (null != publik) {
+            group.put("public", JSONBoolean.getInstance(publik));
+        }
+        if (null != hidden) {
+            group.put("hidden", JSONBoolean.getInstance(hidden));
+        }
+        if (null != anonymous) {
+            group.put("anonymous", JSONBoolean.getInstance(anonymous));
+        }
+        if (null != accessPassword) {
+            group.put("access_password", new JSONString(accessPassword));
+        }
+        if (null != requiredSensors) {
+            JSONArray array = new JSONArray();
+            for (int i = 0; i < requiredSensors.size(); i++) {
+                array.set(i, new JSONString(requiredSensors.get(i)));
+            }
+            group.put("required_sensors", array);
+        }
+        if (null != optionalSensors) {
+            JSONArray array = new JSONArray();
+            for (int i = 0; i < optionalSensors.size(); i++) {
+                array.set(i, new JSONString(optionalSensors.get(i)));
+            }
+            group.put("optional_sensors", array);
+        }
+        if (null != defaultListUsers) {
+            group.put("default_list_users", JSONBoolean.getInstance(defaultListUsers));
+        }
+        if (null != defaultAddUsers) {
+            group.put("default_add_users", JSONBoolean.getInstance(defaultAddUsers));
+        }
+        if (null != defaultRemoveUsers) {
+            group.put("default_remove_users", JSONBoolean.getInstance(defaultRemoveUsers));
+        }
+        if (null != defaultListSensors) {
+            group.put("default_list_sensors", JSONBoolean.getInstance(defaultListSensors));
+        }
+        if (null != defaultAddSensors) {
+            group.put("default_add_sensors", JSONBoolean.getInstance(defaultAddSensors));
+        }
+        if (null != defaultRemoveSensors) {
+            group.put("default_remove_sensors", JSONBoolean.getInstance(defaultRemoveSensors));
+        }
+        if (null != reqShowUsername) {
+            group.put("required_show_username", JSONBoolean.getInstance(reqShowUsername));
+        }
+        if (null != reqShowName) {
+            group.put("required_show_first_name", JSONBoolean.getInstance(reqShowName));
+        }
+        if (null != reqShowSurname) {
+            group.put("required_show_surname", JSONBoolean.getInstance(reqShowSurname));
+        }
+        if (null != reqShowEmail) {
+            group.put("required_show_email", JSONBoolean.getInstance(reqShowEmail));
+        }
+        if (null != reqShowId) {
+            group.put("required_show_id", JSONBoolean.getInstance(reqShowId));
+        }
+        if (null != reqShowAddress) {
+            group.put("required_show_address", JSONBoolean.getInstance(reqShowAddress));
+        }
+        if (null != reqShowZip) {
+            group.put("required_show_zipcode", JSONBoolean.getInstance(reqShowZip));
+        }
+        if (null != reqShowCountry) {
+            group.put("required_show_country", JSONBoolean.getInstance(reqShowCountry));
+        }
+        if (null != reqShowMobile) {
+            group.put("required_show_phone_number", JSONBoolean.getInstance(reqShowMobile));
+        }
+        String data = "{\"group\":" + group.toString() + "}";
+
+        // send request
+        sendRequest(method, url, sessionId, data, callback);
+    }
+
+    /**
+     * 
+     * @param callback
+     * @param sensorId
+     * @param value
+     * @param timestamp
+     */
     public void createSensorData(RequestCallback callback, String sensorId, String value,
             long timestamp) {
 
@@ -155,28 +345,21 @@ public class CommonSenseClient {
         sendRequest(method, url, sessionId, data, callback);
     }
 
-    public void checkUsernameAvailability(RequestCallback callback, String username) {
-
-        // prepare request
-        Method httpMethod = RequestBuilder.GET;
-        String url = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_USERS + "/check/username/" + username).buildString();
-
-        sendRequest(httpMethod, url, null, null, callback);
-    }
-
-    public void checkEmailAvailability(RequestCallback callback, String email) {
-
-        // prepare request
-        Method httpMethod = RequestBuilder.GET;
-        String url = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_USERS + "/check/email/" + email).buildString();
-
-        sendRequest(httpMethod, url, null, null, callback);
-    }
-
+    /**
+     * 
+     * @param callback
+     * @param username
+     * @param password
+     * @param name
+     * @param surname
+     * @param phone
+     * @param email
+     * @param country
+     * @param disableMail
+     */
     public void createUser(RequestCallback callback, String username, String password, String name,
-            String surname, String phone, String email, String country, Boolean disableMail) {
+            String surname, String phone, String email, String address, String zipCode,
+            String country, Boolean disableMail) {
 
         // check if there is a session ID
         if (null == sessionId) {
@@ -204,7 +387,13 @@ public class CommonSenseClient {
             user.put("surname", new JSONString(surname));
         }
         if (null != phone) {
-            user.put("phone", new JSONString(phone));
+            user.put("mobile", new JSONString(phone));
+        }
+        if (null != address) {
+            user.put("address", new JSONString(address));
+        }
+        if (null != zipCode) {
+            user.put("zipcode", new JSONString(zipCode));
         }
         if (null != country) {
             user.put("country", new JSONString(country));
@@ -220,6 +409,11 @@ public class CommonSenseClient {
         sendRequest(method, url, sessionId, data, callback);
     }
 
+    /**
+     * 
+     * @param callback
+     * @param environmentId
+     */
     public void deleteEnvironment(RequestCallback callback, int environmentId) {
 
         // check if there is a session ID
@@ -238,6 +432,12 @@ public class CommonSenseClient {
         sendRequest(method, url, sessionId, null, callback);
     }
 
+    /**
+     * 
+     * @param callback
+     * @param sensorId
+     * @param dataId
+     */
     public void deleteSensorData(RequestCallback callback, String sensorId, String dataId) {
 
         // check if there is a session ID
@@ -256,6 +456,12 @@ public class CommonSenseClient {
         sendRequest(method, url, sessionId, null, callback);
     }
 
+    /**
+     * 
+     * @param callback
+     * @param sensorId
+     * @param serviceId
+     */
     public void disconnectService(RequestCallback callback, String sensorId, String serviceId) {
 
         // check if there is a session ID
@@ -302,6 +508,13 @@ public class CommonSenseClient {
         }
     }
 
+    /**
+     * 
+     * @param callback
+     * @param perPage
+     * @param page
+     * @param groupId
+     */
     public void getAvailableServices(RequestCallback callback, String perPage, String page,
             String groupId) {
 
@@ -329,6 +542,11 @@ public class CommonSenseClient {
         sendRequest(method, url, sessionId, null, callback);
     }
 
+    /**
+     * 
+     * @param callback
+     * @param sensorId
+     */
     public void getConnectedSensors(RequestCallback callback, String sensorId) {
 
         // check if there is a session ID
@@ -367,6 +585,12 @@ public class CommonSenseClient {
         sendRequest(method, url, sessionId, null, callback);
     }
 
+    /**
+     * 
+     * @param callback
+     * @param perPage
+     * @param page
+     */
     public void getEnvironments(RequestCallback callback, String perPage, String page) {
 
         // check if there is a session ID
@@ -391,6 +615,12 @@ public class CommonSenseClient {
         sendRequest(method, url, sessionId, null, callback);
     }
 
+    /**
+     * 
+     * @param callback
+     * @param perPage
+     * @param page
+     */
     public void getGroups(RequestCallback callback, String perPage, String page) {
 
         // check if there is a session ID
@@ -415,6 +645,13 @@ public class CommonSenseClient {
         sendRequest(method, url, sessionId, null, callback);
     }
 
+    /**
+     * 
+     * @param callback
+     * @param groupId
+     * @param perPage
+     * @param page
+     */
     public void getGroupUsers(RequestCallback callback, String groupId, String perPage, String page) {
 
         // check if there is a session ID
@@ -555,6 +792,13 @@ public class CommonSenseClient {
         sendRequest(method, url, sessionId, null, callback);
     }
 
+    /**
+     * 
+     * @param callback
+     * @param sensorId
+     * @param serviceId
+     * @param method
+     */
     public void getServiceMethodDetails(RequestCallback callback, String sensorId,
             String serviceId, String method) {
 
@@ -578,67 +822,12 @@ public class CommonSenseClient {
         sendRequest(httpMethod, url, sessionId, null, callback);
     }
 
-    public void setServiceMethodDetails(RequestCallback callback, String sensorId,
-            String serviceId, String method, String... parameters) {
-
-        // check if there is a session ID
-        if (null == sessionId) {
-            callback.onError(null, new Exception("Not logged in"));
-            return;
-        }
-
-        // prepare request properties
-        Method httpMethod = RequestBuilder.POST;
-        UrlBuilder urlBuilder = new UrlBuilder()
-                .setProtocol(Urls.PROTOCOL)
-                .setHost(Urls.HOST)
-                .setPath(
-                        Urls.PATH_SERVICE_METHODS.replace("%1", sensorId).replace("%2", serviceId)
-                                + "/" + method);
-        String url = urlBuilder.buildString();
-        
-        // prepare request data
-        String data = "{\"parameters\":[";
-        String params = "";
-        for (String param : parameters) {
-            params += param + ",";
-        }
-        if (params.length() > 1) {
-            params = params.substring(0, params.length() - 2);
-        }
-        data += params + "]}";
-
-        // send request
-        sendRequest(httpMethod, url, sessionId, data, callback);
-    }
-
-    public void setServiceManualData(RequestCallback callback, String sensorId, String serviceId,
-            String value, long timestamp) {
-
-        // check if there is a session ID
-        if (null == sessionId) {
-            callback.onError(null, new Exception("Not logged in"));
-            return;
-        }
-
-        // prepare request properties
-        Method httpMethod = RequestBuilder.POST;
-        UrlBuilder urlBuilder = new UrlBuilder()
-                .setProtocol(Urls.PROTOCOL)
-                .setHost(Urls.HOST)
-                .setPath(
-                        Urls.PATH_SERVICE_METHODS.replace("%1", sensorId).replace("%2", serviceId)
-                                + "/manualData");
-        String url = urlBuilder.buildString();
-
-        // prepare request data
-        String date = NumberFormat.getFormat("#.000").format(timestamp / 1000d);
-        String data = "{\"data\":{\"date\":" + date + ",\"value\":\"" + value + "\"}}";
-
-        // send request
-        sendRequest(httpMethod, url, sessionId, data, callback);
-    }
-
+    /**
+     * 
+     * @param callback
+     * @param sensorId
+     * @param serviceId
+     */
     public void getServiceMethods(RequestCallback callback, String sensorId, String serviceId) {
 
         // check if there is a session ID
@@ -659,6 +848,9 @@ public class CommonSenseClient {
         sendRequest(method, url, sessionId, null, callback);
     }
 
+    /**
+     * @return The session ID, or null if it was not set
+     */
     public String getSessionId() {
         return sessionId;
     }
@@ -759,6 +951,12 @@ public class CommonSenseClient {
         sendRequest(method, url, sessionId, null, callback);
     }
 
+    /**
+     * 
+     * @param callback
+     * @param password
+     * @param token
+     */
     public void resetPassword(RequestCallback callback, String password, String token) {
 
         // prepare request details
@@ -780,6 +978,87 @@ public class CommonSenseClient {
         }
     }
 
+    /**
+     * 
+     * @param callback
+     * @param sensorId
+     * @param serviceId
+     * @param value
+     * @param timestamp
+     */
+    public void setServiceManualData(RequestCallback callback, String sensorId, String serviceId,
+            String value, long timestamp) {
+
+        // check if there is a session ID
+        if (null == sessionId) {
+            callback.onError(null, new Exception("Not logged in"));
+            return;
+        }
+
+        // prepare request properties
+        Method httpMethod = RequestBuilder.POST;
+        UrlBuilder urlBuilder = new UrlBuilder()
+                .setProtocol(Urls.PROTOCOL)
+                .setHost(Urls.HOST)
+                .setPath(
+                        Urls.PATH_SERVICE_METHODS.replace("%1", sensorId).replace("%2", serviceId)
+                                + "/manualData");
+        String url = urlBuilder.buildString();
+
+        // prepare request data
+        String date = NumberFormat.getFormat("#.000").format(timestamp / 1000d);
+        String data = "{\"data\":{\"date\":" + date + ",\"value\":\"" + value + "\"}}";
+
+        // send request
+        sendRequest(httpMethod, url, sessionId, data, callback);
+    }
+
+    /**
+     * 
+     * @param callback
+     * @param sensorId
+     * @param serviceId
+     * @param method
+     * @param parameters
+     */
+    public void setServiceMethodDetails(RequestCallback callback, String sensorId,
+            String serviceId, String method, String... parameters) {
+
+        // check if there is a session ID
+        if (null == sessionId) {
+            callback.onError(null, new Exception("Not logged in"));
+            return;
+        }
+
+        // prepare request properties
+        Method httpMethod = RequestBuilder.POST;
+        UrlBuilder urlBuilder = new UrlBuilder()
+                .setProtocol(Urls.PROTOCOL)
+                .setHost(Urls.HOST)
+                .setPath(
+                        Urls.PATH_SERVICE_METHODS.replace("%1", sensorId).replace("%2", serviceId)
+                                + "/" + method);
+        String url = urlBuilder.buildString();
+        
+        // prepare request data
+        String data = "{\"parameters\":[";
+        String params = "";
+        for (String param : parameters) {
+            params += param + ",";
+        }
+        if (params.length() > 1) {
+            params = params.substring(0, params.length() - 2);
+        }
+        data += params + "]}";
+
+        // send request
+        sendRequest(httpMethod, url, sessionId, data, callback);
+    }
+
+    /**
+     * @param sessionId
+     *            The session ID to set
+     */
     public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
     }
