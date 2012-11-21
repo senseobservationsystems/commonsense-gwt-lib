@@ -175,6 +175,50 @@ public class CommonSenseClient {
      * 
      * @param callback
      * @param name
+     * @param description
+     * @param displayName
+     * @param dataType
+     * @param dataStructure
+     */
+    public void createSensor(RequestCallback callback, String name, String description,
+            String displayName, String dataType, String dataStructure) {
+
+        // check if there is a session ID
+        if (null == sessionId) {
+            callback.onError(null, new Exception("Not logged in"));
+            return;
+        }
+
+        // prepare request properties
+        Method method = RequestBuilder.POST;
+        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
+                .setPath(Urls.PATH_GROUPS);
+        String url = urlBuilder.buildString();
+
+        JSONObject sensor = new JSONObject();
+        sensor.put("name", new JSONString(name));
+        if (null != displayName) {
+            sensor.put("display_name", new JSONString(displayName));
+        }
+        if (null != description) {
+            sensor.put("device_type", new JSONString(description));
+        }
+        if (null != dataType) {
+            sensor.put("data_type", new JSONString(dataType));
+        }
+        if (null != dataStructure) {
+            sensor.put("display_name", new JSONString(dataStructure));
+        }
+        String data = "{\"sensor\":" + sensor.toString() + "}";
+
+        // send request
+        sendRequest(method, url, sessionId, data, callback);
+    }
+
+    /**
+     * 
+     * @param callback
+     * @param name
      * @param email
      * @param username
      * @param password
