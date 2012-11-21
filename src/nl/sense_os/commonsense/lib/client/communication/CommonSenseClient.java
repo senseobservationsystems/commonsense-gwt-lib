@@ -5,6 +5,7 @@ import java.util.Map.Entry;
 
 import nl.sense_os.commonsense.lib.client.util.Md5Hasher;
 
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestBuilder.Method;
 import com.google.gwt.http.client.RequestCallback;
@@ -861,8 +862,8 @@ public class CommonSenseClient {
                 .setProtocol(Urls.PROTOCOL)
                 .setHost(Urls.HOST)
                 .setPath(
-                        Urls.PATH_SERVICE_METHODS.replace("%1", sensorId).replace("%2", serviceId)
-                                + "/" + method);
+                        Urls.PATH_SERVICE.replace("%1", sensorId).replace("%2", serviceId) + "/"
+                                + method);
         String url = urlBuilder.buildString();
 
         // send request
@@ -1034,7 +1035,7 @@ public class CommonSenseClient {
                 .setProtocol(Urls.PROTOCOL)
                 .setHost(Urls.HOST)
                 .setPath(
-                        Urls.PATH_SERVICE_METHODS.replace("%1", sensorId).replace("%2", serviceId)
+                        Urls.PATH_SERVICE.replace("%1", sensorId).replace("%2", serviceId)
                                 + "/manualData");
         String url = urlBuilder.buildString();
 
@@ -1069,7 +1070,7 @@ public class CommonSenseClient {
                 .setProtocol(Urls.PROTOCOL)
                 .setHost(Urls.HOST)
                 .setPath(
-                        Urls.PATH_SERVICE_METHODS.replace("%1", sensorId).replace("%2", serviceId)
+                        Urls.PATH_SERVICE.replace("%1", sensorId).replace("%2", serviceId)
                                 + "/" + method);
         String url = urlBuilder.buildString();
         
@@ -1077,10 +1078,10 @@ public class CommonSenseClient {
         String data = "{\"parameters\":[";
         String params = "";
         for (String param : parameters) {
-            params += param + ",";
+            params += JsonUtils.escapeValue(param) + ",";
         }
         if (params.length() > 1) {
-            params = params.substring(0, params.length() - 2);
+            params = params.substring(0, params.length() - 1);
         }
         data += params + "]}";
 
