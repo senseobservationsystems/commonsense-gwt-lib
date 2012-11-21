@@ -89,6 +89,14 @@ public class CommonSenseClient {
             if (null != sessionId) {
                 builder.setHeader("X-SESSION_ID", sessionId);
             }
+            if (null != data) {
+                // set content type header
+                if (data.startsWith("{") && data.endsWith("}")) {
+                    builder.setHeader("Content-Type", JSON_TYPE);
+                } else if (data.contains("=")) {
+                    builder.setHeader("Content-Type", WWW_FORM_URLENCODED);
+                }
+            }
             builder.setHeader("Accept", JSON_TYPE);
             builder.sendRequest(data, callback);
         } catch (Exception e) {
@@ -544,14 +552,7 @@ public class CommonSenseClient {
                 + URL.encode(email);
 
         // send request
-        try {
-            RequestBuilder builder = new RequestBuilder(method, url);
-            builder.setHeader("Content-Type", WWW_FORM_URLENCODED);
-            builder.setHeader("Accept", JSON_TYPE);
-            builder.sendRequest(requestData, callback);
-        } catch (Exception e) {
-            callback.onError(null, e);
-        }
+        sendRequest(method, url, null, requestData, callback);
     }
 
     /**
@@ -974,14 +975,7 @@ public class CommonSenseClient {
         String requestData = "username=" + username + "&password=" + hashedPass;
 
         // send request
-        try {
-            RequestBuilder builder = new RequestBuilder(method, url);
-            builder.setHeader("Content-Type", WWW_FORM_URLENCODED);
-            builder.setHeader("Accept", JSON_TYPE);
-            builder.sendRequest(requestData, callback);
-        } catch (Exception e) {
-            callback.onError(null, e);
-        }
+        sendRequest(method, url, null, requestData, callback);
     }
 
     /**
@@ -1014,14 +1008,7 @@ public class CommonSenseClient {
         String hashedPass = Md5Hasher.hash(password);
         String data = "password=" + hashedPass + "&token=" + token;
 
-        try {
-            RequestBuilder builder = new RequestBuilder(method, url);
-            builder.setHeader("Content-Type", WWW_FORM_URLENCODED);
-            builder.setHeader("Accept", JSON_TYPE);
-            builder.sendRequest(data, callback);
-        } catch (Exception e) {
-            callback.onError(null, e);
-        }
+        sendRequest(method, url, null, data, callback);
     }
 
     /**
