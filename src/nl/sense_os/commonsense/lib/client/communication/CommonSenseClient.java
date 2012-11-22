@@ -41,7 +41,7 @@ public class CommonSenseClient {
         public static final String PATH_FORGOT_PASSWORD = PATH_PREFIX + "requestPasswordReset";
 
         // domains paths
-        public static final String PATH_DOMAIN_USERS = PATH_DOMAINS + "/users";
+        public static final String PATH_DOMAIN_USERS = PATH_DOMAINS + "/%1/users";
 
         // sensors paths
         public static final String PATH_AVAIL_SERVICES = PATH_SENSORS + "/services/available";
@@ -130,7 +130,7 @@ public class CommonSenseClient {
         // prepare request properties
         Method method = RequestBuilder.POST;
         UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_DOMAIN_USERS);
+                .setPath(Urls.PATH_DOMAIN_USERS.replace("%1", domainId));
         String url = urlBuilder.buildString();
 
         // prepare request data
