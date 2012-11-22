@@ -301,7 +301,8 @@ public class CommonSenseClient {
             group.put("anonymous", JSONBoolean.getInstance(anonymous));
         }
         if (null != accessPassword) {
-            group.put("access_password", new JSONString(accessPassword));
+            String hashedPass = Md5Hasher.hash(accessPassword);
+            group.put("access_password", new JSONString(hashedPass));
         }
         if (null != requiredSensors) {
             JSONArray array = new JSONArray();
@@ -415,12 +416,6 @@ public class CommonSenseClient {
     public void createUser(RequestCallback callback, String username, String password, String name,
             String surname, String phone, String email, String address, String zipCode,
             String country, Boolean disableMail) {
-
-        // check if there is a session ID
-        if (null == sessionId) {
-            callback.onError(null, new Exception("Not logged in"));
-            return;
-        }
 
         // prepare request properties
         Method method = RequestBuilder.POST;
