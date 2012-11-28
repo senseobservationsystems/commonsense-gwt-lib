@@ -184,50 +184,6 @@ public class CommonSenseClient {
      * 
      * @param callback
      * @param name
-     * @param description
-     * @param displayName
-     * @param dataType
-     * @param dataStructure
-     */
-    public void createSensor(RequestCallback callback, String name, String description,
-            String displayName, String dataType, String dataStructure) {
-
-        // check if there is a session ID
-        if (null == sessionId) {
-            callback.onError(null, new Exception("Not logged in"));
-            return;
-        }
-
-        // prepare request properties
-        Method method = RequestBuilder.POST;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_GROUPS);
-        String url = urlBuilder.buildString();
-
-        JSONObject sensor = new JSONObject();
-        sensor.put("name", new JSONString(name));
-        if (null != displayName) {
-            sensor.put("display_name", new JSONString(displayName));
-        }
-        if (null != description) {
-            sensor.put("device_type", new JSONString(description));
-        }
-        if (null != dataType) {
-            sensor.put("data_type", new JSONString(dataType));
-        }
-        if (null != dataStructure) {
-            sensor.put("display_name", new JSONString(dataStructure));
-        }
-        String data = "{\"sensor\":" + sensor.toString() + "}";
-
-        // send request
-        sendRequest(method, url, sessionId, data, callback);
-    }
-
-    /**
-     * 
-     * @param callback
-     * @param name
      * @param email
      * @param username
      * @param password
@@ -364,6 +320,50 @@ public class CommonSenseClient {
             group.put("required_show_phone_number", JSONBoolean.getInstance(reqShowMobile));
         }
         String data = "{\"group\":" + group.toString() + "}";
+
+        // send request
+        sendRequest(method, url, sessionId, data, callback);
+    }
+
+    /**
+     * 
+     * @param callback
+     * @param name
+     * @param description
+     * @param displayName
+     * @param dataType
+     * @param dataStructure
+     */
+    public void createSensor(RequestCallback callback, String name, String description,
+            String displayName, String dataType, String dataStructure) {
+
+        // check if there is a session ID
+        if (null == sessionId) {
+            callback.onError(null, new Exception("Not logged in"));
+            return;
+        }
+
+        // prepare request properties
+        Method method = RequestBuilder.POST;
+        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
+                .setPath(Urls.PATH_GROUPS);
+        String url = urlBuilder.buildString();
+
+        JSONObject sensor = new JSONObject();
+        sensor.put("name", new JSONString(name));
+        if (null != displayName) {
+            sensor.put("display_name", new JSONString(displayName));
+        }
+        if (null != description) {
+            sensor.put("device_type", new JSONString(description));
+        }
+        if (null != dataType) {
+            sensor.put("data_type", new JSONString(dataType));
+        }
+        if (null != dataStructure) {
+            sensor.put("display_name", new JSONString(dataStructure));
+        }
+        String data = "{\"sensor\":" + sensor.toString() + "}";
 
         // send request
         sendRequest(method, url, sessionId, data, callback);
@@ -555,6 +555,46 @@ public class CommonSenseClient {
      * 
      * @param callback
      * @param perPage
+     *            Specifies which page of the results must be retrieved. The page offset starts at
+     *            0.
+     * @param page
+     *            Specifies the amount of items that must be received at once. The maximum amount is
+     *            1000 items and the default amount is 100 items.
+     * @param publik
+     *            Optional. If publik is true, only public groups are returned, if public is false
+     *            only private groups are returned.
+     */
+    public void getAllGroups(RequestCallback callback, Integer perPage, Integer page, Boolean publik) {
+
+        // check if there is a session ID
+        if (null == sessionId) {
+            callback.onError(null, new Exception("Not logged in"));
+            return;
+        }
+
+        // prepare request properties
+        Method method = RequestBuilder.GET;
+        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
+                .setPath(Urls.PATH_GROUPS + "/all");
+        if (null != page) {
+            urlBuilder.setParameter("page", page.toString());
+        }
+        if (null != perPage) {
+            urlBuilder.setParameter("per_page", perPage.toString());
+        }
+        if (null != publik) {
+            urlBuilder.setParameter("public", publik ? "1" : "0");
+        }
+        String url = urlBuilder.buildString();
+
+        // send request
+        sendRequest(method, url, sessionId, null, callback);
+    }
+
+    /**
+     * 
+     * @param callback
+     * @param perPage
      * @param page
      * @param groupId
      */
@@ -662,9 +702,19 @@ public class CommonSenseClient {
      * 
      * @param callback
      * @param perPage
+     *            Specifies which page of the results must be retrieved. The page offset starts at
+     *            0.
      * @param page
+     *            Specifies the amount of items that must be received at once. The maximum amount is
+     *            1000 items and the default amount is 100 items.
+     * @param total
+     *            Optional. By adding this parameter a total item count will be added to the result.
+     * @param publik
+     *            Optional. With this parameter set to 1, only public groups are returned and when
+     *            it is set to 0 only private groups are returned.
      */
-    public void getGroups(RequestCallback callback, String perPage, String page) {
+    public void getGroups(RequestCallback callback, Integer perPage, Integer page, Boolean total,
+            Boolean publik) {
 
         // check if there is a session ID
         if (null == sessionId) {
@@ -677,10 +727,16 @@ public class CommonSenseClient {
         UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
                 .setPath(Urls.PATH_GROUPS);
         if (null != page) {
-            urlBuilder.setParameter("page", page);
+            urlBuilder.setParameter("page", page.toString());
         }
         if (null != perPage) {
-            urlBuilder.setParameter("per_page", perPage);
+            urlBuilder.setParameter("per_page", perPage.toString());
+        }
+        if (null != total) {
+            urlBuilder.setParameter("total", total ? "1" : "0");
+        }
+        if (null != publik) {
+            urlBuilder.setParameter("public", publik ? "1" : "0");
         }
         String url = urlBuilder.buildString();
 
