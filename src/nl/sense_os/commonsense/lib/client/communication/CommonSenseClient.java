@@ -598,7 +598,7 @@ public class CommonSenseClient {
      * @param page
      * @param groupId
      */
-    public void getAvailableServices(RequestCallback callback, String perPage, String page,
+    public void getAvailableServices(RequestCallback callback, Integer perPage, Integer page,
             String groupId) {
 
         // check if there is a session ID
@@ -612,10 +612,10 @@ public class CommonSenseClient {
         UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
                 .setPath(Urls.PATH_AVAIL_SERVICES);
         if (null != page) {
-            urlBuilder.setParameter("page", page);
+            urlBuilder.setParameter("page", page.toString());
         }
         if (null != perPage) {
-            urlBuilder.setParameter("per_page", perPage);
+            urlBuilder.setParameter("per_page", perPage.toString());
         }
         if (null != groupId) {
             urlBuilder.setParameter("group_id", groupId);
@@ -674,7 +674,7 @@ public class CommonSenseClient {
      * @param perPage
      * @param page
      */
-    public void getEnvironments(RequestCallback callback, String perPage, String page) {
+    public void getEnvironments(RequestCallback callback, Integer perPage, Integer page) {
 
         // check if there is a session ID
         if (null == sessionId) {
@@ -687,10 +687,10 @@ public class CommonSenseClient {
         UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
                 .setPath(Urls.PATH_ENVIRONMENTS);
         if (null != page) {
-            urlBuilder.setParameter("page", page);
+            urlBuilder.setParameter("page", page.toString());
         }
         if (null != perPage) {
-            urlBuilder.setParameter("per_page", perPage);
+            urlBuilder.setParameter("per_page", perPage.toString());
         }
         String url = urlBuilder.buildString();
 
@@ -751,7 +751,8 @@ public class CommonSenseClient {
      * @param perPage
      * @param page
      */
-    public void getGroupUsers(RequestCallback callback, String groupId, String perPage, String page) {
+    public void getGroupUsers(RequestCallback callback, String groupId, Integer perPage,
+            Integer page) {
 
         // check if there is a session ID
         if (null == sessionId) {
@@ -764,10 +765,10 @@ public class CommonSenseClient {
         UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
                 .setPath(Urls.PATH_GROUP_USERS.replace("%1", groupId));
         if (null != page) {
-            urlBuilder.setParameter("page", page);
+            urlBuilder.setParameter("page", page.toString());
         }
         if (null != perPage) {
-            urlBuilder.setParameter("per_page", perPage);
+            urlBuilder.setParameter("per_page", perPage.toString());
         }
         String url = urlBuilder.buildString();
 
