@@ -592,7 +592,7 @@ public class CommonSenseClient {
      * @param callback
      * @param environmentId
      */
-    public void deleteEnvironment(RequestCallback callback, int environmentId) {
+    public void deleteEnvironment(RequestCallback callback, String environmentId) {
 
         // check if there is a session ID
         if (null == sessionId) {
@@ -604,6 +604,32 @@ public class CommonSenseClient {
         Method method = RequestBuilder.DELETE;
         UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
                 .setPath(Urls.PATH_ENVIRONMENTS + "/" + environmentId);
+        String url = urlBuilder.buildString();
+
+        // send request
+        sendRequest(method, url, sessionId, null, callback);
+    }
+
+    /**
+     * Deletes the group if the group has no other members. If the group does have other members,
+     * the current user will be removed from the group. When a user leaves a group all his shared
+     * sensors are automatically removed from this group.
+     * 
+     * @param callback
+     * @param groupId
+     */
+    public void deleteGroup(RequestCallback callback, String groupId) {
+
+        // check if there is a session ID
+        if (null == sessionId) {
+            callback.onError(null, new Exception("Not logged in"));
+            return;
+        }
+
+        // prepare request properties
+        Method method = RequestBuilder.DELETE;
+        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
+                .setPath(Urls.PATH_GROUPS + "/" + groupId);
         String url = urlBuilder.buildString();
 
         // send request
