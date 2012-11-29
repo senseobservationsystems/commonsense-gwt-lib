@@ -134,17 +134,145 @@ public class CommonSenseClient {
         String url = urlBuilder.buildString();
 
         // prepare request data
-        String user = "";
-        if (null != userId && null != username) {
-            user = "{\"id\":\"" + userId + "\",\"username\":\"" + username + "\"}";
-        } else if (null != userId) {
-            user = "{\"id\":\"" + userId + "\"}";
-        } else if (null != username) {
-            user = "{\"username\":\"" + username + "\"}";
-        } else {
-            callback.onError(null, new Throwable("Cannot find user ID or user name"));
+        JSONObject user = new JSONObject();
+        if (null != userId) {
+            user.put("id", new JSONString(userId));
         }
-        String data = "{\"users\":[" + user + "]}";
+        if (null != username) {
+            user.put("username", new JSONString(username));
+        }
+        JSONArray users = new JSONArray();
+        users.set(0, user);
+        JSONObject obj = new JSONObject();
+        obj.put("users", users);
+        String data = obj.toString();
+
+        // send request
+        sendRequest(method, url, sessionId, data, callback);
+    }
+
+
+    /**
+     * Adds a user to the group. To add a user at least a username or user ID must be specified.
+     * Users can only at themselves to a group. When joining a public group or a private group with
+     * access password a user is automatically accepted in a group. To join a private group without
+     * access password members of the group with the add user right should accept a user in a group
+     * via this function.
+     * 
+     * @param callback
+     * @param groupId
+     * @param userId
+     * @param username
+     * @param listUsers
+     * @param addUsers
+     * @param removeUsers
+     * @param listSensors
+     * @param addSensors
+     * @param removeSensors
+     * @param editGroup
+     * @param showId
+     * @param showUsername
+     * @param showName
+     * @param showSurname
+     * @param showEmail
+     * @param showPhone
+     * @param sensorIds
+     * @param accessPassword
+     *            Unhashed group access password
+     */
+    public void addGroupUser(RequestCallback callback, String groupId, String userId,
+            String username, Boolean listUsers, Boolean addUsers, Boolean removeUsers,
+            Boolean listSensors, Boolean addSensors, Boolean removeSensors, Boolean editGroup,
+            Boolean showId, Boolean showUsername, Boolean showName, Boolean showSurname,
+            Boolean showEmail, Boolean showPhone, List<String> sensorIds, String accessPassword) {
+
+        // check if there is a session ID
+        if (null == sessionId) {
+            callback.onError(null, new Exception("Not logged in"));
+            return;
+        }
+
+        // prepare request properties
+        Method method = RequestBuilder.POST;
+        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
+                .setPath(Urls.PATH_GROUP_USERS.replace("%1", groupId));
+        String url = urlBuilder.buildString();
+
+        // prepare request data
+        JSONObject item = new JSONObject();
+
+        // user
+        JSONObject user = new JSONObject();
+        if (null != userId) {
+            user.put("id", new JSONString(userId));
+        }
+        if (null != username) {
+            user.put("username", new JSONString(username));
+        }
+        item.put("user", user);
+
+        // group permissions
+        JSONObject permissions = new JSONObject();
+        if (null != listUsers) {
+            permissions.put("list_users", JSONBoolean.getInstance(listUsers));
+        }
+        if (null != addUsers) {
+            permissions.put("add_users", JSONBoolean.getInstance(addUsers));
+        }
+        if (null != removeUsers) {
+            permissions.put("remove_users", JSONBoolean.getInstance(removeUsers));
+        }
+        if (null != listSensors) {
+            permissions.put("list_sensors", JSONBoolean.getInstance(listSensors));
+        }
+        if (null != addSensors) {
+            permissions.put("add_sensors", JSONBoolean.getInstance(addSensors));
+        }
+        if (null != removeSensors) {
+            permissions.put("remove_sensors", JSONBoolean.getInstance(removeSensors));
+        }
+        if (null != editGroup) {
+            permissions.put("edit_group", JSONBoolean.getInstance(editGroup));
+        }
+        item.put("group_permissions", permissions);
+
+        // display user info
+        JSONObject userInfo = new JSONObject();
+        if (null != showId) {
+            userInfo.put("show_id", JSONBoolean.getInstance(showUsername));
+        }
+        if (null != showUsername) {
+            userInfo.put("show_username", JSONBoolean.getInstance(showUsername));
+        }
+        if (null != showName) {
+            userInfo.put("show_first_name", JSONBoolean.getInstance(showName));
+        }
+        if (null != showSurname) {
+            userInfo.put("show_surname", JSONBoolean.getInstance(showSurname));
+        }
+        if (null != showEmail) {
+            userInfo.put("show_email", JSONBoolean.getInstance(showEmail));
+        }
+        if (null != showPhone) {
+            userInfo.put("show_phone_number", JSONBoolean.getInstance(showPhone));
+        }
+        item.put("display_user_info", userInfo);
+
+        // share sensors
+        JSONArray sensors = new JSONArray();
+        if (null != sensorIds) {
+            for (int i = 0; i < sensorIds.size(); i++) {
+                sensors.set(i, new JSONString(sensorIds.get(i)));
+            }
+        }
+        item.put("sensors", sensors);
+        String hashedPass = Md5Hasher.hash(accessPassword);
+        item.put("access_password", new JSONString(hashedPass));
+        JSONArray users = new JSONArray();
+        users.set(0, item);
+        JSONObject obj = new JSONObject();
+        obj.put("users", users);
+        String data = obj.toString();
 
         // send request
         sendRequest(method, url, sessionId, data, callback);
