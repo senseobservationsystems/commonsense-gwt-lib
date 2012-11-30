@@ -528,10 +528,14 @@ public class CommonSenseClient {
     }
 
     /**
+     * Creates a user account. The response content will contain the created user information. The
+     * UUID is a uniquely generated ID which can be used to retrieve data without logging in.
      * 
      * @param callback
      * @param username
+     *            Username (must be unique)
      * @param password
+     *            Unhashed password
      * @param name
      * @param surname
      * @param phone
@@ -549,6 +553,10 @@ public class CommonSenseClient {
         Method method = RequestBuilder.POST;
         UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
                 .setPath(Urls.PATH_USERS);
+
+        if (null != disableMail) {
+            urlBuilder.setParameter("disable_mail", disableMail ? "1" : "0");
+        }
         String url = urlBuilder.buildString();
 
         // prepare data
@@ -575,9 +583,6 @@ public class CommonSenseClient {
         }
         if (null != country) {
             user.put("country", new JSONString(country));
-        }
-        if (null != disableMail) {
-            user.put("disable_mail", new JSONString(disableMail ? "1" : "0"));
         }
         JSONObject jso = new JSONObject();
         jso.put("user", user);
