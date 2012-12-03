@@ -151,34 +151,51 @@ public class CommonSenseClient {
         sendRequest(method, url, sessionId, data, callback);
     }
 
-
     /**
-     * Adds a user to the group. To add a user at least a username or user ID must be specified.
-     * Users can only at themselves to a group. When joining a public group or a private group with
-     * access password a user is automatically accepted in a group. To join a private group without
-     * access password members of the group with the add user right should accept a user in a group
-     * via this function.
+     * Adds a user to the group.<br/>
+     * <br/>
+     * To add a user at least a username or user ID must be specified. Users can only add themselves
+     * to a group. When joining a public group or a private group with access password a user is
+     * automatically accepted in a group. To join a private group without access password members of
+     * the group with the add user right should accept a user in a group via this function.
      * 
      * @param callback
      * @param groupId
+     *            Group identifier
      * @param userId
+     *            Identifier of the user that should be added. Optional if the username is provided
      * @param username
+     *            Username of the user that should be added. Optional if the user ID is provided
      * @param listUsers
+     *            Optional.
      * @param addUsers
+     *            Optional.
      * @param removeUsers
+     *            Optional.
      * @param listSensors
+     *            Optional.
      * @param addSensors
+     *            Optional.
      * @param removeSensors
+     *            Optional.
      * @param editGroup
+     *            Optional.
      * @param showId
+     *            Optional.
      * @param showUsername
+     *            Optional.
      * @param showName
+     *            Optional.
      * @param showSurname
+     *            Optional.
      * @param showEmail
+     *            Optional.
      * @param showPhone
+     *            Optional.
      * @param sensorIds
+     *            Optional.
      * @param accessPassword
-     *            Unhashed group access password
+     *            Optional. Unhashed group access password
      */
     public void addGroupUser(RequestCallback callback, String groupId, String userId,
             String username, Boolean listUsers, Boolean addUsers, Boolean removeUsers,
@@ -711,17 +728,20 @@ public class CommonSenseClient {
     }
 
     /**
+     * Gets a list of all visible groups.
      * 
      * @param callback
      * @param perPage
-     *            Specifies which page of the results must be retrieved. The page offset starts at
-     *            0.
+     *            Optional. Specifies which page of the results must be retrieved. The page offset
+     *            starts at 0.
      * @param page
-     *            Specifies the amount of items that must be received at once. The maximum amount is
-     *            1000 items and the default amount is 100 items.
+     *            Optional. Specifies the amount of items that must be received at once. The maximum
+     *            amount is 1000 items and the default amount is 100 items.
      * @param publik
      *            Optional. If publik is true, only public groups are returned, if public is false
      *            only private groups are returned.
+     * 
+     * @see #getGroups(RequestCallback, Integer, Integer, Boolean, Boolean)
      */
     public void getAllGroups(RequestCallback callback, Integer perPage, Integer page, Boolean publik) {
 
@@ -858,19 +878,21 @@ public class CommonSenseClient {
     }
 
     /**
+     * Gets the list of groups that the user is a member of.
      * 
      * @param callback
      * @param perPage
-     *            Specifies which page of the results must be retrieved. The page offset starts at
-     *            0.
+     *            Optional. Specifies which page of the results must be retrieved. The page offset
+     *            starts at 0.
      * @param page
-     *            Specifies the amount of items that must be received at once. The maximum amount is
-     *            1000 items and the default amount is 100 items.
+     *            Optional. Specifies the amount of items that must be received at once. The maximum
+     *            amount is 1000 items and the default amount is 100 items.
      * @param total
      *            Optional. By adding this parameter a total item count will be added to the result.
      * @param publik
      *            Optional. With this parameter set to 1, only public groups are returned and when
      *            it is set to 0 only private groups are returned.
+     * @see #getAllGroups(RequestCallback, Integer, Integer, Boolean)
      */
     public void getGroups(RequestCallback callback, Integer perPage, Integer page, Boolean total,
             Boolean publik) {
@@ -1281,10 +1303,10 @@ public class CommonSenseClient {
                 .setProtocol(Urls.PROTOCOL)
                 .setHost(Urls.HOST)
                 .setPath(
-                        Urls.PATH_SERVICE.replace("%1", sensorId).replace("%2", serviceId)
-                                + "/" + method);
+                        Urls.PATH_SERVICE.replace("%1", sensorId).replace("%2", serviceId) + "/"
+                                + method);
         String url = urlBuilder.buildString();
-        
+
         // prepare request data
         String data = "{\"parameters\":[";
         String params = "";
