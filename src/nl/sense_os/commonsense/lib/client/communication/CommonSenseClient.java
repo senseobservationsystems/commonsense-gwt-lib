@@ -1,15 +1,17 @@
 package nl.sense_os.commonsense.lib.client.communication;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import nl.sense_os.commonsense.lib.client.util.Md5Hasher;
 
-import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestBuilder.Method;
 import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.URL;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.UrlBuilder;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONArray;
@@ -76,30 +78,87 @@ public class CommonSenseClient {
     }
 
     /**
+     * Sends request without data. Adds X-SESSION_ID header for authentication, Content-Type and
+     * Accept headers data parsing.
      * 
+     * @param callback
      * @param method
      * @param url
      * @param sessionId
-     * @param data
-     * @param callback
      */
-    private static void sendRequest(Method method, String url, String sessionId, String data,
-            RequestCallback callback) {
+    private static void sendRequest(RequestCallback callback, Method method, String url,
+            String sessionId) {
         try {
             RequestBuilder builder = new RequestBuilder(method, url);
             if (null != sessionId) {
                 builder.setHeader("X-SESSION_ID", sessionId);
             }
-            if (null != data) {
-                // set content type header
-                if (data.startsWith("{") && data.endsWith("}")) {
-                    builder.setHeader("Content-Type", JSON_TYPE);
-                } else if (data.contains("=")) {
-                    builder.setHeader("Content-Type", WWW_FORM_URLENCODED);
-                }
-            }
             builder.setHeader("Accept", JSON_TYPE);
-            builder.sendRequest(data, callback);
+            builder.sendRequest(null, callback);
+        } catch (Exception e) {
+            callback.onError(null, e);
+        }
+    }
+
+    /**
+     * Sends request with JSON data. Adds X-SESSION_ID header for authentication, Content-Type and
+     * Accept headers data parsing.
+     * 
+     * @param callback
+     * @param method
+     * @param url
+     * @param sessionId
+     * @param jsonData
+     */
+    private static void sendRequest(RequestCallback callback, Method method, String url,
+            String sessionId, JSONObject jsonData) {
+        try {
+            // serialize the json object
+            String requestData = jsonData.toString();
+
+            // prepare the request
+            RequestBuilder builder = new RequestBuilder(method, url);
+            if (null != sessionId) {
+                builder.setHeader("X-SESSION_ID", sessionId);
+            }
+            builder.setHeader("Content-Type", JSON_TYPE);
+            builder.setHeader("Accept", JSON_TYPE);
+
+            builder.sendRequest(requestData, callback);
+        } catch (Exception e) {
+            callback.onError(null, e);
+        }
+    }
+
+    /**
+     * Sends request with URL encoded data. Adds X-SESSION_ID header for authentication,
+     * Content-Type and Accept headers data parsing.
+     * 
+     * @param callback
+     * @param method
+     * @param url
+     * @param sessionId
+     * @param formData
+     */
+    private static void sendRequest(RequestCallback callback, Method method, String url,
+            String sessionId, Map<String, String> formData) {
+        try {
+            // put values in form urlencoded form
+            String requestData = "";
+            for (Entry<String, String> entry : formData.entrySet()) {
+                requestData += (requestData.length() > 0 ? "&" : "");
+                requestData += entry.getKey() + "=" + entry.getValue();
+            }
+
+            // prepare the request
+            RequestBuilder builder = new RequestBuilder(method, url);
+            if (null != sessionId) {
+                builder.setHeader("X-SESSION_ID", sessionId);
+            }
+            builder.setHeader("Content-Type", WWW_FORM_URLENCODED);
+            builder.setHeader("Accept", JSON_TYPE);
+
+            builder.sendRequest(requestData, callback);
         } catch (Exception e) {
             callback.onError(null, e);
         }
@@ -143,12 +202,11 @@ public class CommonSenseClient {
         }
         JSONArray users = new JSONArray();
         users.set(0, user);
-        JSONObject obj = new JSONObject();
-        obj.put("users", users);
-        String data = obj.toString();
+        JSONObject jsonData = new JSONObject();
+        jsonData.put("users", users);
 
         // send request
-        sendRequest(method, url, sessionId, data, callback);
+        sendRequest(callback, method, url, sessionId, jsonData);
     }
 
     /**
@@ -287,12 +345,11 @@ public class CommonSenseClient {
         item.put("access_password", new JSONString(hashedPass));
         JSONArray users = new JSONArray();
         users.set(0, item);
-        JSONObject obj = new JSONObject();
-        obj.put("users", users);
-        String data = obj.toString();
+        JSONObject jsonData = new JSONObject();
+        jsonData.put("users", users);
 
         // send request
-        sendRequest(method, url, sessionId, data, callback);
+        sendRequest(callback, method, url, sessionId, jsonData);
     }
 
     /**
@@ -307,7 +364,7 @@ public class CommonSenseClient {
         String url = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
                 .setPath(Urls.PATH_USERS + "/check/email/" + email).buildString();
 
-        sendRequest(httpMethod, url, null, null, callback);
+        sendRequest(callback, httpMethod, url, null);
     }
 
     /**
@@ -322,7 +379,7 @@ public class CommonSenseClient {
         String url = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
                 .setPath(Urls.PATH_USERS + "/check/username/" + username).buildString();
 
-        sendRequest(httpMethod, url, null, null, callback);
+        sendRequest(callback, httpMethod, url, null);
     }
 
     /**
@@ -464,10 +521,11 @@ public class CommonSenseClient {
         if (null != reqShowMobile) {
             group.put("required_show_phone_number", JSONBoolean.getInstance(reqShowMobile));
         }
-        String data = "{\"group\":" + group.toString() + "}";
+        JSONObject jsonData = new JSONObject();
+        jsonData.put("group", group);
 
         // send request
-        sendRequest(method, url, sessionId, data, callback);
+        sendRequest(callback, method, url, sessionId, jsonData);
     }
 
     /**
@@ -508,10 +566,11 @@ public class CommonSenseClient {
         if (null != dataStructure) {
             sensor.put("display_name", new JSONString(dataStructure));
         }
-        String data = "{\"sensor\":" + sensor.toString() + "}";
+        JSONObject jsonData = new JSONObject();
+        jsonData.put("sensor", sensor);
 
         // send request
-        sendRequest(method, url, sessionId, data, callback);
+        sendRequest(callback, method, url, sessionId, jsonData);
     }
 
     /**
@@ -538,10 +597,14 @@ public class CommonSenseClient {
 
         // prepare request data
         String date = NumberFormat.getFormat("#.000").format(timestamp / 1000d);
-        String data = "{\"data\":{\"value\":\"" + value + "\",\"date\":" + date + "}}";
+        JSONObject dataPoint = new JSONObject();
+        dataPoint.put("value", new JSONString(value));
+        dataPoint.put("date", new JSONString(date));
+        JSONObject jsonData = new JSONObject();
+        jsonData.put("data", dataPoint);
 
         // send request
-        sendRequest(method, url, sessionId, data, callback);
+        sendRequest(callback, method, url, sessionId, jsonData);
     }
 
     /**
@@ -601,12 +664,11 @@ public class CommonSenseClient {
         if (null != country) {
             user.put("country", new JSONString(country));
         }
-        JSONObject jso = new JSONObject();
-        jso.put("user", user);
-        String data = jso.toString();
+        JSONObject jsonData = new JSONObject();
+        jsonData.put("user", user);
 
         // send request
-        sendRequest(method, url, sessionId, data, callback);
+        sendRequest(callback, method, url, sessionId, jsonData);
     }
 
     /**
@@ -629,7 +691,7 @@ public class CommonSenseClient {
         String url = urlBuilder.buildString();
 
         // send request
-        sendRequest(method, url, sessionId, null, callback);
+        sendRequest(callback, method, url, sessionId);
     }
 
     /**
@@ -655,7 +717,7 @@ public class CommonSenseClient {
         String url = urlBuilder.buildString();
 
         // send request
-        sendRequest(method, url, sessionId, null, callback);
+        sendRequest(callback, method, url, sessionId);
     }
 
     /**
@@ -679,7 +741,7 @@ public class CommonSenseClient {
         String url = urlBuilder.buildString();
 
         // send request
-        sendRequest(method, url, sessionId, null, callback);
+        sendRequest(callback, method, url, sessionId);
     }
 
     /**
@@ -703,7 +765,7 @@ public class CommonSenseClient {
         String url = urlBuilder.buildString();
 
         // send request
-        sendRequest(method, url, sessionId, null, callback);
+        sendRequest(callback, method, url, sessionId);
     }
 
     /**
@@ -720,11 +782,15 @@ public class CommonSenseClient {
                 .setPath(Urls.PATH_FORGOT_PASSWORD).buildString();
 
         // prepare request data
-        String requestData = null != username ? "username=" + URL.encode(username) : "email="
-                + URL.encode(email);
+        Map<String, String> formData = new HashMap<String, String>();
+        if (null != username) {
+            formData.put("username", username);
+        } else {
+            formData.put("email", email);
+        }
 
         // send request
-        sendRequest(method, url, null, requestData, callback);
+        sendRequest(callback, method, url, null, formData);
     }
 
     /**
@@ -767,7 +833,7 @@ public class CommonSenseClient {
         String url = urlBuilder.buildString();
 
         // send request
-        sendRequest(method, url, sessionId, null, callback);
+        sendRequest(callback, method, url, sessionId);
     }
 
     /**
@@ -801,7 +867,7 @@ public class CommonSenseClient {
         }
         String url = urlBuilder.buildString();
 
-        sendRequest(method, url, sessionId, null, callback);
+        sendRequest(callback, method, url, sessionId);
     }
 
     /**
@@ -824,7 +890,7 @@ public class CommonSenseClient {
         String url = urlBuilder.buildString();
 
         // send request
-        sendRequest(method, url, sessionId, null, callback);
+        sendRequest(callback, method, url, sessionId);
     }
 
     /**
@@ -844,7 +910,7 @@ public class CommonSenseClient {
                 .setPath(Urls.PATH_CURRENT_USER).buildString();
 
         // send request
-        sendRequest(method, url, sessionId, null, callback);
+        sendRequest(callback, method, url, sessionId);
     }
 
     /**
@@ -874,7 +940,7 @@ public class CommonSenseClient {
         String url = urlBuilder.buildString();
 
         // send request
-        sendRequest(method, url, sessionId, null, callback);
+        sendRequest(callback, method, url, sessionId);
     }
 
     /**
@@ -922,7 +988,7 @@ public class CommonSenseClient {
         String url = urlBuilder.buildString();
 
         // send request
-        sendRequest(method, url, sessionId, null, callback);
+        sendRequest(callback, method, url, sessionId);
     }
 
     /**
@@ -954,7 +1020,7 @@ public class CommonSenseClient {
         String url = urlBuilder.buildString();
 
         // send request
-        sendRequest(method, url, sessionId, null, callback);
+        sendRequest(callback, method, url, sessionId);
     }
 
     /**
@@ -1019,7 +1085,7 @@ public class CommonSenseClient {
         String url = urlBuilder.buildString();
 
         // send request
-        sendRequest(method, url, sessionId, null, callback);
+        sendRequest(callback, method, url, sessionId);
     }
 
     /**
@@ -1070,7 +1136,7 @@ public class CommonSenseClient {
         String url = urlBuilder.buildString();
 
         // send request
-        sendRequest(method, url, sessionId, null, callback);
+        sendRequest(callback, method, url, sessionId);
     }
 
     /**
@@ -1078,10 +1144,10 @@ public class CommonSenseClient {
      * @param callback
      * @param sensorId
      * @param serviceId
-     * @param method
+     * @param methodName
      */
     public void getServiceMethodDetails(RequestCallback callback, String sensorId,
-            String serviceId, String method) {
+            String serviceId, String methodName) {
 
         // check if there is a session ID
         if (null == sessionId) {
@@ -1090,17 +1156,17 @@ public class CommonSenseClient {
         }
 
         // prepare request properties
-        Method httpMethod = RequestBuilder.GET;
+        Method method = RequestBuilder.GET;
         UrlBuilder urlBuilder = new UrlBuilder()
                 .setProtocol(Urls.PROTOCOL)
                 .setHost(Urls.HOST)
                 .setPath(
                         Urls.PATH_SERVICE.replace("%1", sensorId).replace("%2", serviceId) + "/"
-                                + method);
+                                + methodName);
         String url = urlBuilder.buildString();
 
         // send request
-        sendRequest(httpMethod, url, sessionId, null, callback);
+        sendRequest(callback, method, url, sessionId);
     }
 
     /**
@@ -1126,7 +1192,7 @@ public class CommonSenseClient {
         String url = urlBuilder.buildString();
 
         // send request
-        sendRequest(method, url, sessionId, null, callback);
+        sendRequest(callback, method, url, sessionId);
     }
 
     /**
@@ -1189,6 +1255,8 @@ public class CommonSenseClient {
     }
 
     /**
+     * Tries to log in. Stores the session ID if the call was successful.
+     * 
      * @param callback
      *            RequestCallback to handle HTTP response
      * @param username
@@ -1196,7 +1264,7 @@ public class CommonSenseClient {
      * @param password
      *            Password (unhashed)
      */
-    public void login(RequestCallback callback, String username, String password) {
+    public void login(final RequestCallback callback, String username, String password) {
 
         // prepare request properties
         Method method = RequestBuilder.POST;
@@ -1206,10 +1274,34 @@ public class CommonSenseClient {
 
         // prepare request data
         String hashedPass = Md5Hasher.hash(password);
-        String requestData = "username=" + username + "&password=" + hashedPass;
+        Map<String, String> formData = new HashMap<String, String>();
+        formData.put("username", username);
+        formData.put("password", hashedPass);
+
+        RequestCallback requestCallback = new RequestCallback() {
+
+            @Override
+            public void onResponseReceived(Request request, Response response) {
+                try {
+                    // try to get the session ID from the header
+                    if (response.getStatusCode() == Response.SC_OK) {
+                        String sessionId = response.getHeader("X-SESSION_ID");
+                        setSessionId(sessionId);
+                    }
+                } catch (Exception e) {
+                    // ignore
+                }
+                callback.onResponseReceived(request, response);
+            }
+
+            @Override
+            public void onError(Request request, Throwable exception) {
+                callback.onError(request, exception);
+            }
+        };
 
         // send request
-        sendRequest(method, url, null, requestData, callback);
+        sendRequest(requestCallback, method, url, null, formData);
     }
 
     /**
@@ -1222,7 +1314,7 @@ public class CommonSenseClient {
                 .setPath(Urls.PATH_LOGOUT).buildString();
 
         // send request
-        sendRequest(method, url, sessionId, null, callback);
+        sendRequest(callback, method, url, sessionId);
     }
 
     /**
@@ -1240,9 +1332,11 @@ public class CommonSenseClient {
 
         // prepare request data
         String hashedPass = Md5Hasher.hash(password);
-        String data = "password=" + hashedPass + "&token=" + token;
+        Map<String, String> formData = new HashMap<String, String>();
+        formData.put("token", token);
+        formData.put("password", hashedPass);
 
-        sendRequest(method, url, null, data, callback);
+        sendRequest(callback, method, url, null, formData);
     }
 
     /**
@@ -1263,7 +1357,7 @@ public class CommonSenseClient {
         }
 
         // prepare request properties
-        Method httpMethod = RequestBuilder.POST;
+        Method method = RequestBuilder.POST;
         UrlBuilder urlBuilder = new UrlBuilder()
                 .setProtocol(Urls.PROTOCOL)
                 .setHost(Urls.HOST)
@@ -1274,10 +1368,14 @@ public class CommonSenseClient {
 
         // prepare request data
         String date = NumberFormat.getFormat("#.000").format(timestamp / 1000d);
-        String data = "{\"data\":{\"date\":" + date + ",\"value\":\"" + value + "\"}}";
+        JSONObject dataPoint = new JSONObject();
+        dataPoint.put("value", new JSONString(value));
+        dataPoint.put("date", new JSONString(date));
+        JSONObject jsonData = new JSONObject();
+        jsonData.put("data", dataPoint);
 
         // send request
-        sendRequest(httpMethod, url, sessionId, data, callback);
+        sendRequest(callback, method, url, sessionId, jsonData);
     }
 
     /**
@@ -1285,11 +1383,11 @@ public class CommonSenseClient {
      * @param callback
      * @param sensorId
      * @param serviceId
-     * @param method
+     * @param methodName
      * @param parameters
      */
     public void setServiceMethodDetails(RequestCallback callback, String sensorId,
-            String serviceId, String method, String... parameters) {
+            String serviceId, String methodName, String... parameters) {
 
         // check if there is a session ID
         if (null == sessionId) {
@@ -1298,28 +1396,26 @@ public class CommonSenseClient {
         }
 
         // prepare request properties
-        Method httpMethod = RequestBuilder.POST;
+        Method method = RequestBuilder.POST;
         UrlBuilder urlBuilder = new UrlBuilder()
                 .setProtocol(Urls.PROTOCOL)
                 .setHost(Urls.HOST)
                 .setPath(
                         Urls.PATH_SERVICE.replace("%1", sensorId).replace("%2", serviceId) + "/"
-                                + method);
+                                + methodName);
         String url = urlBuilder.buildString();
 
         // prepare request data
-        String data = "{\"parameters\":[";
-        String params = "";
-        for (String param : parameters) {
-            params += JsonUtils.escapeValue(param) + ",";
+        JSONArray params = new JSONArray();
+        for (int i = 0; i < parameters.length; i++) {
+            String parameter = parameters[i];
+            params.set(i, new JSONString(parameter));
         }
-        if (params.length() > 1) {
-            params = params.substring(0, params.length() - 1);
-        }
-        data += params + "]}";
+        JSONObject jsonData = new JSONObject();
+        jsonData.put("parameters", params);
 
         // send request
-        sendRequest(httpMethod, url, sessionId, data, callback);
+        sendRequest(callback, method, url, sessionId, jsonData);
     }
 
     /**
