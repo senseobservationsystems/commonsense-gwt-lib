@@ -1,5 +1,5 @@
-commonsense-gwt-library
-=======================
+commonsense-gwt-lib
+===================
 
 Client library for using CommonSense in Google Web Toolkit apps.
 
