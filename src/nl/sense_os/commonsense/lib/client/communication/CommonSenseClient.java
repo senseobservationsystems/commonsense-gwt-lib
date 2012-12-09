@@ -882,6 +882,32 @@ public class CommonSenseClient {
     }
 
     /**
+     * Deletes a sensor at CommonSense. If the current user is the owner of the sensor then the
+     * sensor will be removed from the current user and all other users. If the current user is not
+     * owner of the sensor then access to the sensor will be removed for this user.
+     * 
+     * @param callback
+     * @param sensorId
+     */
+    public void deleteSensor(RequestCallback callback, String sensorId) {
+
+        // check if there is a session ID
+        if (null == sessionId) {
+            callback.onError(null, new Exception("Not logged in"));
+            return;
+        }
+
+        // prepare request properties
+        Method method = RequestBuilder.DELETE;
+        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
+                .setPath(Urls.PATH_SENSORS + "/" + sensorId);
+        String url = urlBuilder.buildString();
+
+        // send request
+        sendRequest(callback, method, url, sessionId);
+    }
+
+    /**
      * 
      * @param callback
      * @param sensorId
@@ -1442,6 +1468,11 @@ public class CommonSenseClient {
         RequestCallback requestCallback = new RequestCallback() {
 
             @Override
+            public void onError(Request request, Throwable exception) {
+                callback.onError(request, exception);
+            }
+
+            @Override
             public void onResponseReceived(Request request, Response response) {
                 try {
                     // try to get the session ID from the header
@@ -1453,11 +1484,6 @@ public class CommonSenseClient {
                     // ignore
                 }
                 callback.onResponseReceived(request, response);
-            }
-
-            @Override
-            public void onError(Request request, Throwable exception) {
-                callback.onError(request, exception);
             }
         };
 
