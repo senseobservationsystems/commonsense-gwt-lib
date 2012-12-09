@@ -16,6 +16,7 @@ import com.google.gwt.http.client.UrlBuilder;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONBoolean;
+import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
 import com.google.gwt.user.client.Window.Location;
@@ -468,6 +469,52 @@ public class CommonSenseClient {
     }
 
     /**
+     * Creates a new environment.
+     * 
+     * @param callback
+     * @param name
+     * @param floors
+     *            Indicates the amount of floors the environment has.
+     * @param gpsOutline
+     *            GPS outline of the environment. Should contain a list of latitude longitude points
+     *            describing the outline of the environment. The list of points should create a
+     *            polygon. The latitude longitude coordinates are separated by a space and each
+     *            tuple by a comma. Optionally a third coordinate altitude can be specified after
+     *            the longitude separated by a space. This field can have 8000 characters.
+     * @param position
+     *            Position of the environment. Should be the center of the environment which is also
+     *            a GPS point in the order latitude longitude altitude separated by spaces.
+     */
+    public void createEnvironment(RequestCallback callback, String name, int floors,
+            String gpsOutline, String position) {
+
+        // check if there is a session ID
+        if (null == sessionId) {
+            callback.onError(null, new Exception("Not logged in"));
+            return;
+        }
+
+        // prepare request properties
+        Method method = RequestBuilder.POST;
+        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
+                .setPath(Urls.PATH_ENVIRONMENTS);
+        String url = urlBuilder.buildString();
+
+        // prepare data
+        JSONObject environment = new JSONObject();
+        environment.put("name", new JSONString(name));
+        environment.put("floors", new JSONNumber(floors));
+        environment.put("gps_outline", new JSONString(gpsOutline));
+        environment.put("position", new JSONString(position));
+        JSONObject jsonData = new JSONObject();
+        jsonData.put("environment", environment);
+
+        // send request
+        sendRequest(callback, method, url, sessionId, jsonData);
+    }
+
+    /**
+     * Create a new group.
      * 
      * @param callback
      * @param name
@@ -614,6 +661,7 @@ public class CommonSenseClient {
     }
 
     /**
+     * Creates a new sensor.
      * 
      * @param callback
      * @param name
