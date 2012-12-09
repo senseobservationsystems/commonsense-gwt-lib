@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import nl.sense_os.commonsense.lib.client.model.apiclass.Group;
 import nl.sense_os.commonsense.lib.client.util.Md5Hasher;
 
 import com.google.gwt.http.client.Request;
@@ -469,7 +470,7 @@ public class CommonSenseClient {
     }
 
     /**
-     * Creates a new environment.
+     * Creates a new environment at CommonSense.
      * 
      * @param callback
      * @param name
@@ -514,7 +515,34 @@ public class CommonSenseClient {
     }
 
     /**
-     * Create a new group.
+     * Creates a new group at CommonSense.
+     * 
+     * @param callback
+     * @param group
+     */
+    public void createGroup(RequestCallback callback, Group group) {
+
+        // check if there is a session ID
+        if (null == sessionId) {
+            callback.onError(null, new Exception("Not logged in"));
+            return;
+        }
+
+        // prepare request properties
+        Method method = RequestBuilder.POST;
+        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
+                .setPath(Urls.PATH_GROUPS);
+        String url = urlBuilder.buildString();
+
+        JSONObject jsonData = new JSONObject();
+        jsonData.put("group", new JSONObject(group));
+
+        // send request
+        sendRequest(callback, method, url, sessionId, jsonData);
+    }
+
+    /**
+     * Create a new group at CommonSense.
      * 
      * @param callback
      * @param name
