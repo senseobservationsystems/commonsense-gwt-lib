@@ -58,6 +58,9 @@ public class CommonSenseClient {
         // groups paths
         public static final String PATH_GROUP_USERS = PATH_GROUPS + "/%1/users";
 
+        // environments paths
+        public static final String PATH_ENVIRONMENT_SENSORS = PATH_ENVIRONMENTS + "/%1/sensors";
+
         private Urls() {
             // do not instantiate
         }
@@ -204,6 +207,42 @@ public class CommonSenseClient {
         users.set(0, user);
         JSONObject jsonData = new JSONObject();
         jsonData.put("users", users);
+
+        // send request
+        sendRequest(callback, method, url, sessionId, jsonData);
+    }
+
+    /**
+     * Adds a list of sensors to an environment.
+     * 
+     * @param callback
+     * @param environmentId
+     * @param sensorIds
+     */
+    public void addEnvironmentSensors(RequestCallback callback, String environmentId,
+            List<String> sensorIds) {
+
+        // check if there is a session ID
+        if (null == sessionId) {
+            callback.onError(null, new Exception("Not logged in"));
+            return;
+        }
+
+        // prepare request properties
+        Method method = RequestBuilder.POST;
+        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
+                .setPath(Urls.PATH_ENVIRONMENT_SENSORS.replace("%1", environmentId));
+        String url = urlBuilder.buildString();
+
+        // prepare body
+        JSONArray sensors = new JSONArray();
+        for (int i = 0; i < sensorIds.size(); i++) {
+            JSONObject sensor = new JSONObject();
+            sensor.put("id", new JSONString(sensorIds.get(i)));
+            sensors.set(i, sensor);
+        }
+        JSONObject jsonData = new JSONObject();
+        jsonData.put("sensors", sensors);
 
         // send request
         sendRequest(callback, method, url, sessionId, jsonData);
