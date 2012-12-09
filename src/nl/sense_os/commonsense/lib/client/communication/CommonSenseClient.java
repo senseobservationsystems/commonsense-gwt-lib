@@ -1530,6 +1530,33 @@ public class CommonSenseClient {
     }
 
     /**
+     * Removes a user from the group. Only members with the right to delete users can perform this
+     * action. If a user leaves a group then all his shared sensors will be removed from this group
+     * automatically.
+     * 
+     * @param callback
+     * @param groupId
+     * @param userId
+     */
+    public void removeGroupUser(RequestCallback callback, String groupId, String userId) {
+
+        // check if there is a session ID
+        if (null == sessionId) {
+            callback.onError(null, new Exception("Not logged in"));
+            return;
+        }
+
+        // prepare request properties
+        Method method = RequestBuilder.DELETE;
+        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
+                .setPath(Urls.PATH_GROUP_USERS.replace("%1", groupId) + "/" + userId);
+        String url = urlBuilder.buildString();
+
+        // send request
+        sendRequest(callback, method, url, sessionId);
+    }
+
+    /**
      * 
      * @param callback
      * @param password
