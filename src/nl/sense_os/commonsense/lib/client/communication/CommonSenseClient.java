@@ -1704,4 +1704,29 @@ public class CommonSenseClient {
         // send request
         sendRequest(callback, method, url, sessionId, jsonData);
     }
+
+    /**
+     * Removes a users from a sensor, which removes the access to the sensor for this user.
+     * 
+     * @param callback
+     * @param sensorId
+     * @param userId
+     */
+    public void unshareSensor(RequestCallback callback, String sensorId, String userId) {
+
+        // check if there is a session ID
+        if (null == sessionId) {
+            callback.onError(null, new Exception("Not logged in"));
+            return;
+        }
+
+        // prepare request properties
+        Method method = RequestBuilder.DELETE;
+        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
+                .setPath(Urls.PATH_SENSOR_USERS.replace("%1", sensorId) + "/" + userId);
+        String url = urlBuilder.buildString();
+
+        // send request
+        sendRequest(callback, method, url, sessionId);
+    }
 }
