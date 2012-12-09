@@ -1664,4 +1664,44 @@ public class CommonSenseClient {
     public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
     }
+    
+    /**
+     * Add a user to a sensor, giving the user access to the sensor and data. Only the owner of the
+     * sensor is able to upload data, mutate sensors and add users to their sensor. To add a user at
+     * least a username or user ID must be specified.
+     * 
+     * @param callback
+     * @param sensorId
+     * @param userId
+     * @param username
+     */
+    public void shareSensor(RequestCallback callback, String sensorId, String userId,
+            String username) {
+
+        // check if there is a session ID
+        if (null == sessionId) {
+            callback.onError(null, new Exception("Not logged in"));
+            return;
+        }
+
+        // prepare request properties
+        Method method = RequestBuilder.POST;
+        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
+                .setPath(Urls.PATH_SENSOR_USERS.replace("%1", sensorId));
+        String url = urlBuilder.buildString();
+
+        // prepare request data
+        JSONObject user = new JSONObject();
+        if (null != userId) {
+            user.put("id", new JSONString(userId));
+        }
+        if (null != username) {
+            user.put("username", new JSONString(username));
+        }
+        JSONObject jsonData = new JSONObject();
+        jsonData.put("user", user);
+
+        // send request
+        sendRequest(callback, method, url, sessionId, jsonData);
+    }
 }
