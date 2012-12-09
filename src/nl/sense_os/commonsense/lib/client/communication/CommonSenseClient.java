@@ -48,6 +48,8 @@ public class CommonSenseClient {
         // sensors paths
         public static final String PATH_AVAIL_SERVICES = PATH_SENSORS + "/services/available";
         public static final String PATH_SENSOR_DATA = PATH_SENSORS + "/%1/data";
+        public static final String PATH_SENSOR_USERS = PATH_SENSORS + "/%1/users";
+        public static final String PATH_SENSOR_DEVICE = PATH_SENSORS + "/%1/device";
         public static final String PATH_SERVICE = PATH_SENSORS + "/%1/services/%2";
         public static final String PATH_SERVICE_METHODS = PATH_SERVICE + "/methods";
         public static final String PATH_CONNECTED_SENSORS = PATH_SENSORS + "/%1/sensors";
@@ -386,6 +388,50 @@ public class CommonSenseClient {
         users.set(0, item);
         JSONObject jsonData = new JSONObject();
         jsonData.put("users", users);
+
+        // send request
+        sendRequest(callback, method, url, sessionId, jsonData);
+    }
+
+    /**
+     * Adds a sensor to a device. If the device does not exists then it will be created. Either a
+     * device ID, or a type and UUID combination is needed. The type of the sensor will be
+     * automatically be set to 1, i.e. physical.
+     * 
+     * @param callback
+     * @param sensorId
+     * @param deviceId
+     * @param deviceType
+     * @param deviceUuid
+     */
+    public void addSensorDevice(RequestCallback callback, String sensorId, String deviceId,
+            String deviceType, String deviceUuid) {
+
+        // check if there is a session ID
+        if (null == sessionId) {
+            callback.onError(null, new Exception("Not logged in"));
+            return;
+        }
+
+        // prepare request properties
+        Method method = RequestBuilder.POST;
+        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
+                .setPath(Urls.PATH_SENSOR_DEVICE.replace("%1", sensorId));
+        String url = urlBuilder.buildString();
+
+        // prepare body
+        JSONObject device = new JSONObject();
+        if (null != deviceId) {
+            device.put("id", new JSONString(deviceId));
+        }
+        if (null != deviceType) {
+            device.put("type", new JSONString(deviceType));
+        }
+        if (null != deviceUuid) {
+            device.put("uuid", new JSONString(deviceUuid));
+        }
+        JSONObject jsonData = new JSONObject();
+        jsonData.put("device", device);
 
         // send request
         sendRequest(callback, method, url, sessionId, jsonData);
