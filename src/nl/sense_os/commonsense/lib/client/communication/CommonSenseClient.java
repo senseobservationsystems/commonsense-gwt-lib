@@ -1179,6 +1179,31 @@ public class CommonSenseClient {
     }
 
     /**
+     * Gets the details of a group. Details of a private group can only be viewed by members and
+     * details of a public group by all users.
+     * 
+     * @param callback
+     * @param groupId
+     */
+    public void getGroupDetails(RequestCallback callback, String groupId) {
+
+        // check if there is a session ID
+        if (null == sessionId) {
+            callback.onError(null, new Exception("Not logged in"));
+            return;
+        }
+
+        // prepare request properties
+        Method method = RequestBuilder.GET;
+        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
+                .setPath(Urls.PATH_GROUPS + "/" + groupId);
+        String url = urlBuilder.buildString();
+
+        // send request
+        sendRequest(callback, method, url, sessionId);
+    }
+
+    /**
      * 
      * @param callback
      * @param groupId
