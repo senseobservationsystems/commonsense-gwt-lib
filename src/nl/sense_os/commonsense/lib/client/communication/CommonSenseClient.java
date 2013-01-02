@@ -1,5 +1,6 @@
 package nl.sense_os.commonsense.lib.client.communication;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,13 +76,29 @@ public class CommonSenseClient {
     private static final String WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
 
     /**
+     * Creates a CommonSenseClient instance for the default API at http://api.sense-os.nl.
+     * 
      * @return A CommonSenseClient instance, using singleton pattern
+     * @see {@link #getClient(String)} if you want to avoid CORS issues in older browsers or IE
      */
     public static final CommonSenseClient getClient() {
         if (null == instance) {
             instance = new CommonSenseClient();
         }
         return instance;
+    }
+
+    /**
+     * Creates a CommonSenseClient instance for a specific proxy of the CommonSense API.
+     * 
+     * @param proxy
+     *            URL of the CommonSense proxy to use
+     * @return A CommonSenseClient instance, using singleton pattern
+     */
+    public static final CommonSenseClient getClient(String proxy) {
+        CommonSenseClient client = getClient();
+        client.setProxy(proxy);
+        return client;
     }
 
     /**
@@ -173,6 +190,8 @@ public class CommonSenseClient {
 
     private String sessionId;
 
+    private String proxy;
+
     private CommonSenseClient() {
         // private constructor to prevent direct instantiation
     }
@@ -195,9 +214,7 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.POST;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_DOMAIN_USERS.replace("%1", domainId));
-        String url = urlBuilder.buildString();
+        String url = getApiUrl(Urls.PATH_DOMAIN_USERS.replace("%1", domainId));
 
         // prepare request data
         JSONObject user = new JSONObject();
@@ -234,9 +251,8 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.POST;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_ENVIRONMENT_SENSORS.replace("%1", environmentId));
-        String url = urlBuilder.buildString();
+        String path = Urls.PATH_ENVIRONMENT_SENSORS.replace("%1", environmentId);
+        String url = getApiUrl(path);
 
         // prepare body
         JSONArray sensors = new JSONArray();
@@ -312,9 +328,8 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.POST;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_GROUP_USERS.replace("%1", groupId));
-        String url = urlBuilder.buildString();
+        String path = Urls.PATH_GROUP_USERS.replace("%1", groupId);
+        String url = getApiUrl(path);
 
         // prepare request data
         JSONObject item = new JSONObject();
@@ -417,9 +432,8 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.POST;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_SENSOR_DEVICE.replace("%1", sensorId));
-        String url = urlBuilder.buildString();
+        String path = Urls.PATH_SENSOR_DEVICE.replace("%1", sensorId);
+        String url = getApiUrl(path);
 
         // prepare body
         JSONObject device = new JSONObject();
@@ -448,8 +462,7 @@ public class CommonSenseClient {
 
         // prepare request
         Method httpMethod = RequestBuilder.GET;
-        String url = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_USERS + "/check/email/" + email).buildString();
+        String url = getApiUrl(Urls.PATH_USERS + "/check/email/" + email);
 
         sendRequest(callback, httpMethod, url, null);
     }
@@ -463,8 +476,7 @@ public class CommonSenseClient {
 
         // prepare request
         Method httpMethod = RequestBuilder.GET;
-        String url = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_USERS + "/check/username/" + username).buildString();
+        String url = getApiUrl(Urls.PATH_USERS + "/check/username/" + username);
 
         sendRequest(callback, httpMethod, url, null);
     }
@@ -497,9 +509,8 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.POST;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_ENVIRONMENTS);
-        String url = urlBuilder.buildString();
+        String path = Urls.PATH_ENVIRONMENTS;
+        String url = getApiUrl(path);
 
         // prepare data
         JSONObject environment = new JSONObject();
@@ -530,9 +541,8 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.POST;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_GROUPS);
-        String url = urlBuilder.buildString();
+        String path = Urls.PATH_GROUPS;
+        String url = getApiUrl(path);
 
         JSONObject jsonData = new JSONObject();
         jsonData.put("group", new JSONObject(group));
@@ -589,9 +599,8 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.POST;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_GROUPS);
-        String url = urlBuilder.buildString();
+        String path = Urls.PATH_GROUPS;
+        String url = getApiUrl(path);
 
         // prepare request data
         JSONObject group = new JSONObject();
@@ -709,9 +718,8 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.POST;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_GROUPS);
-        String url = urlBuilder.buildString();
+        String path = Urls.PATH_GROUPS;
+        String url = getApiUrl(path);
 
         JSONObject sensor = new JSONObject();
         sensor.put("name", new JSONString(name));
@@ -752,9 +760,8 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.POST;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_SENSOR_DATA.replace("%1", sensorId));
-        String url = urlBuilder.buildString();
+        String path = Urls.PATH_SENSOR_DATA.replace("%1", sensorId);
+        String url = getApiUrl(path);
 
         // prepare request data
         String date = NumberFormat.getFormat("#.000").format(timestamp / 1000d);
@@ -792,13 +799,12 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.POST;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_USERS);
+        String path = Urls.PATH_USERS;
 
         if (null != disableMail) {
-            urlBuilder.setParameter("disable_mail", disableMail ? "1" : "0");
+            path += "?disable_mail=" + (disableMail ? "1" : "0");
         }
-        String url = urlBuilder.buildString();
+        String url = getApiUrl(path);
 
         // prepare data
         JSONObject user = new JSONObject();
@@ -847,9 +853,8 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.DELETE;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_ENVIRONMENTS + "/" + environmentId);
-        String url = urlBuilder.buildString();
+        String path = Urls.PATH_ENVIRONMENTS + "/" + environmentId;
+        String url = getApiUrl(path);
 
         // send request
         sendRequest(callback, method, url, sessionId);
@@ -873,9 +878,8 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.DELETE;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_GROUPS + "/" + groupId);
-        String url = urlBuilder.buildString();
+        String path = Urls.PATH_GROUPS + "/" + groupId;
+        String url = getApiUrl(path);
 
         // send request
         sendRequest(callback, method, url, sessionId);
@@ -899,9 +903,8 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.DELETE;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_SENSORS + "/" + sensorId);
-        String url = urlBuilder.buildString();
+        String path = Urls.PATH_SENSORS + "/" + sensorId;
+        String url = getApiUrl(path);
 
         // send request
         sendRequest(callback, method, url, sessionId);
@@ -923,9 +926,8 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.DELETE;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_SENSOR_DATA.replace("%1", sensorId) + "/" + dataId);
-        String url = urlBuilder.buildString();
+        String path = Urls.PATH_SENSOR_DATA.replace("%1", sensorId) + "/" + dataId;
+        String url = getApiUrl(path);
 
         // send request
         sendRequest(callback, method, url, sessionId);
@@ -947,9 +949,8 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.DELETE;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_SERVICE.replace("%1", sensorId).replace("%2", serviceId));
-        String url = urlBuilder.buildString();
+        String path = Urls.PATH_SERVICE.replace("%1", sensorId).replace("%2", serviceId);
+        String url = getApiUrl(path);
 
         // send request
         sendRequest(callback, method, url, sessionId);
@@ -965,8 +966,7 @@ public class CommonSenseClient {
 
         // prepare request details
         Method method = RequestBuilder.POST;
-        String url = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_FORGOT_PASSWORD).buildString();
+        String url = getApiUrl(Urls.PATH_FORGOT_PASSWORD);
 
         // prepare request data
         Map<String, String> formData = new HashMap<String, String>();
@@ -1006,21 +1006,52 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.GET;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_GROUPS + "/all");
+        String path = Urls.PATH_GROUPS + "/all";
+        List<String> params = new ArrayList<String>();
         if (null != page) {
-            urlBuilder.setParameter("page", page.toString());
+            params.add("page=" + page.toString());
         }
         if (null != perPage) {
-            urlBuilder.setParameter("per_page", perPage.toString());
+            params.add("per_page=" + perPage.toString());
         }
         if (null != publik) {
-            urlBuilder.setParameter("public", publik ? "1" : "0");
+            params.add("public=" + (publik ? "1" : "0"));
         }
-        String url = urlBuilder.buildString();
+        String url = getApiUrl(path, params.toArray(new String[0]));
 
         // send request
         sendRequest(callback, method, url, sessionId);
+    }
+
+    /**
+     * Creates a URL to the path in the CommonSense API. Uses a proxy if this was specified.
+     * 
+     * @param path
+     *            The path in the CommonSense API, e.g. sensors/1/data
+     * @param params
+     *            Set of URL query parameters, e.g. "details=full"
+     * @return A URL String
+     */
+    private String getApiUrl(String path, String... params) {
+
+        // create URL
+        String url = "";
+        if (null == proxy) {
+            UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
+                    .setPath(path);
+            url = urlBuilder.buildString();
+        } else {
+            url = proxy + "/" + path;
+        }
+
+        // create parameters String
+        String parameters = "";
+        for (int i = 0; i < params.length; i++) {
+            parameters += "&" + params[i];
+        }
+        parameters = parameters.replaceFirst("&", "?");
+
+        return url + parameters;
     }
 
     /**
@@ -1041,18 +1072,19 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.GET;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_AVAIL_SERVICES);
+        String path = Urls.PATH_AVAIL_SERVICES;
+
+        List<String> params = new ArrayList<String>();
         if (null != page) {
-            urlBuilder.setParameter("page", page.toString());
+            params.add("page=" + page.toString());
         }
         if (null != perPage) {
-            urlBuilder.setParameter("per_page", perPage.toString());
+            params.add("per_page=" + perPage.toString());
         }
         if (null != groupId) {
-            urlBuilder.setParameter("group_id", groupId);
+            params.add("group_id=" + groupId);
         }
-        String url = urlBuilder.buildString();
+        String url = getApiUrl(path, params.toArray(new String[0]));
 
         sendRequest(callback, method, url, sessionId);
     }
@@ -1072,9 +1104,8 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.GET;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_CONNECTED_SENSORS.replace("%1", sensorId));
-        String url = urlBuilder.buildString();
+        String path = Urls.PATH_CONNECTED_SENSORS.replace("%1", sensorId);
+        String url = getApiUrl(path);
 
         // send request
         sendRequest(callback, method, url, sessionId);
@@ -1093,8 +1124,7 @@ public class CommonSenseClient {
         }
 
         Method method = RequestBuilder.GET;
-        String url = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_CURRENT_USER).buildString();
+        String url = getApiUrl(Urls.PATH_CURRENT_USER);
 
         // send request
         sendRequest(callback, method, url, sessionId);
@@ -1116,15 +1146,40 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.GET;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_ENVIRONMENTS);
+        String path = Urls.PATH_ENVIRONMENTS;
+
+        List<String> params = new ArrayList<String>();
         if (null != page) {
-            urlBuilder.setParameter("page", page.toString());
+            params.add("page=" + page.toString());
         }
         if (null != perPage) {
-            urlBuilder.setParameter("per_page", perPage.toString());
+            params.add("per_page=" + perPage.toString());
         }
-        String url = urlBuilder.buildString();
+        String url = getApiUrl(path, params.toArray(new String[0]));
+
+        // send request
+        sendRequest(callback, method, url, sessionId);
+    }
+
+    /**
+     * Gets the details of a group. Details of a private group can only be viewed by members and
+     * details of a public group by all users.
+     * 
+     * @param callback
+     * @param groupId
+     */
+    public void getGroupDetails(RequestCallback callback, String groupId) {
+
+        // check if there is a session ID
+        if (null == sessionId) {
+            callback.onError(null, new Exception("Not logged in"));
+            return;
+        }
+
+        // prepare request properties
+        Method method = RequestBuilder.GET;
+        String path = Urls.PATH_GROUPS + "/" + groupId;
+        String url = getApiUrl(path);
 
         // send request
         sendRequest(callback, method, url, sessionId);
@@ -1158,46 +1213,22 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.GET;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_GROUPS);
+        String path = Urls.PATH_GROUPS;
+
+        List<String> params = new ArrayList<String>();
         if (null != page) {
-            urlBuilder.setParameter("page", page.toString());
+            params.add("page=" + page.toString());
         }
         if (null != perPage) {
-            urlBuilder.setParameter("per_page", perPage.toString());
+            params.add("per_page=" + perPage.toString());
         }
         if (null != total) {
-            urlBuilder.setParameter("total", total ? "1" : "0");
+            params.add("total=" + (total ? "1" : "0"));
         }
         if (null != publik) {
-            urlBuilder.setParameter("public", publik ? "1" : "0");
+            params.add("public=" + (publik ? "1" : "0"));
         }
-        String url = urlBuilder.buildString();
-
-        // send request
-        sendRequest(callback, method, url, sessionId);
-    }
-
-    /**
-     * Gets the details of a group. Details of a private group can only be viewed by members and
-     * details of a public group by all users.
-     * 
-     * @param callback
-     * @param groupId
-     */
-    public void getGroupDetails(RequestCallback callback, String groupId) {
-
-        // check if there is a session ID
-        if (null == sessionId) {
-            callback.onError(null, new Exception("Not logged in"));
-            return;
-        }
-
-        // prepare request properties
-        Method method = RequestBuilder.GET;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_GROUPS + "/" + groupId);
-        String url = urlBuilder.buildString();
+        String url = getApiUrl(path, params.toArray(new String[0]));
 
         // send request
         sendRequest(callback, method, url, sessionId);
@@ -1221,15 +1252,16 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.GET;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_GROUP_USERS.replace("%1", groupId));
+        String path = Urls.PATH_GROUP_USERS.replace("%1", groupId);
+
+        List<String> params = new ArrayList<String>();
         if (null != page) {
-            urlBuilder.setParameter("page", page.toString());
+            params.add("page=" + page.toString());
         }
         if (null != perPage) {
-            urlBuilder.setParameter("per_page", perPage.toString());
+            params.add("per_page=" + perPage.toString());
         }
-        String url = urlBuilder.buildString();
+        String url = getApiUrl(path, params.toArray(new String[0]));
 
         // send request
         sendRequest(callback, method, url, sessionId);
@@ -1261,40 +1293,41 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.GET;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_SENSOR_DATA.replace("%1", sensorId));
+        String path = Urls.PATH_SENSOR_DATA.replace("%1", sensorId);
+
+        List<String> params = new ArrayList<String>();
         if (null != startDate) {
             String dateString = NumberFormat.getFormat("#.000").format(
                     startDate.longValue() / 1000d);
-            urlBuilder.setParameter("start_date", dateString);
+            params.add("start_date=" + dateString);
         }
         if (null != endDate) {
             String dateString = NumberFormat.getFormat("#.000").format(endDate.longValue() / 1000d);
-            urlBuilder.setParameter("end_date", dateString);
+            params.add("end_date=" + dateString);
         }
         if (null != date) {
             String dateString = NumberFormat.getFormat("#.000").format(date.longValue() / 1000d);
-            urlBuilder.setParameter("date", dateString);
+            params.add("date=" + dateString);
         }
         if (null != perPage) {
-            urlBuilder.setParameter("per_page", perPage.toString());
+            params.add("per_page=" + perPage.toString());
         }
         if (null != page) {
-            urlBuilder.setParameter("page", page.toString());
+            params.add("page=" + page.toString());
         }
         if (null != interval) {
-            urlBuilder.setParameter("interval", interval.toString());
+            params.add("interval=" + interval.toString());
         }
         if (null != last) {
-            urlBuilder.setParameter("last", last ? "1" : "0");
+            params.add("last=" + (last ? "1" : "0"));
         }
         if (null != next) {
-            urlBuilder.setParameter("next", next ? "1" : "0");
+            params.add("next=" + (next ? "1" : "0"));
         }
         if (null != sort) {
-            urlBuilder.setParameter("sort", sort);
+            params.add("sort=" + sort);
         }
-        String url = urlBuilder.buildString();
+        String url = getApiUrl(path, params.toArray(new String[0]));
 
         // send request
         sendRequest(callback, method, url, sessionId);
@@ -1322,30 +1355,31 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.GET;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_SENSORS);
+        String path = Urls.PATH_SENSORS;
+
+        List<String> params = new ArrayList<String>();
         if (null != page) {
-            urlBuilder.setParameter("page", page.toString());
+            params.add("page=" + page.toString());
         }
         if (null != perPage) {
-            urlBuilder.setParameter("per_page", perPage.toString());
+            params.add("per_page=" + perPage.toString());
         }
         if (null != shared) {
-            urlBuilder.setParameter("shared", shared ? "1" : "0");
+            params.add("shared=" + (shared ? "1" : "0"));
         }
         if (null != owned) {
-            urlBuilder.setParameter("owned", owned ? "1" : "0");
+            params.add("owned=" + (owned ? "1" : "0"));
         }
         if (null != physical) {
-            urlBuilder.setParameter("physical", physical ? "1" : "0");
+            params.add("physical=" + (physical ? "1" : "0"));
         }
         if (null != details) {
-            urlBuilder.setParameter("details", details);
+            params.add("details=" + details);
         }
         if (null != groupId) {
-            urlBuilder.setParameter("group_id", groupId);
+            params.add("group_id=" + groupId);
         }
-        String url = urlBuilder.buildString();
+        String url = getApiUrl(path, params.toArray(new String[0]));
 
         // send request
         sendRequest(callback, method, url, sessionId);
@@ -1369,13 +1403,9 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.GET;
-        UrlBuilder urlBuilder = new UrlBuilder()
-                .setProtocol(Urls.PROTOCOL)
-                .setHost(Urls.HOST)
-                .setPath(
-                        Urls.PATH_SERVICE.replace("%1", sensorId).replace("%2", serviceId) + "/"
-                                + methodName);
-        String url = urlBuilder.buildString();
+        String path = Urls.PATH_SERVICE.replace("%1", sensorId).replace("%2", serviceId) + "/"
+                + methodName;
+        String url = getApiUrl(path);
 
         // send request
         sendRequest(callback, method, url, sessionId);
@@ -1397,11 +1427,8 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.GET;
-        UrlBuilder urlBuilder = new UrlBuilder()
-                .setProtocol(Urls.PROTOCOL)
-                .setHost(Urls.HOST)
-                .setPath(Urls.PATH_SERVICE_METHODS.replace("%1", sensorId).replace("%2", serviceId));
-        String url = urlBuilder.buildString();
+        String path = Urls.PATH_SERVICE_METHODS.replace("%1", sensorId).replace("%2", serviceId);
+        String url = getApiUrl(path);
 
         // send request
         sendRequest(callback, method, url, sessionId);
@@ -1480,9 +1507,7 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.POST;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_LOGIN);
-        String url = urlBuilder.buildString();
+        String url = getApiUrl(Urls.PATH_LOGIN);
 
         // prepare request data
         String hashedPass = Md5Hasher.hash(password);
@@ -1522,8 +1547,7 @@ public class CommonSenseClient {
     public void logout(RequestCallback callback) {
 
         Method method = RequestBuilder.GET;
-        String url = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_LOGOUT).buildString();
+        String url = getApiUrl(Urls.PATH_LOGOUT);
 
         // send request
         sendRequest(callback, method, url, sessionId);
@@ -1548,9 +1572,8 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.DELETE;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_GROUP_USERS.replace("%1", groupId) + "/" + userId);
-        String url = urlBuilder.buildString();
+        String path = Urls.PATH_GROUP_USERS.replace("%1", groupId) + "/" + userId;
+        String url = getApiUrl(path);
 
         // send request
         sendRequest(callback, method, url, sessionId);
@@ -1566,8 +1589,7 @@ public class CommonSenseClient {
 
         // prepare request details
         Method method = RequestBuilder.POST;
-        String url = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_PW_RESET).buildString();
+        String url = getApiUrl(Urls.PATH_PW_RESET);
 
         // prepare request data
         String hashedPass = Md5Hasher.hash(password);
@@ -1576,6 +1598,10 @@ public class CommonSenseClient {
         formData.put("password", hashedPass);
 
         sendRequest(callback, method, url, null, formData);
+    }
+
+    public void setProxy(String proxy) {
+        this.proxy = proxy;
     }
 
     /**
@@ -1597,13 +1623,9 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.POST;
-        UrlBuilder urlBuilder = new UrlBuilder()
-                .setProtocol(Urls.PROTOCOL)
-                .setHost(Urls.HOST)
-                .setPath(
-                        Urls.PATH_SERVICE.replace("%1", sensorId).replace("%2", serviceId)
-                                + "/manualData");
-        String url = urlBuilder.buildString();
+        String path = Urls.PATH_SERVICE.replace("%1", sensorId).replace("%2", serviceId)
+                + "/manualData";
+        String url = getApiUrl(path);
 
         // prepare request data
         String date = NumberFormat.getFormat("#.000").format(timestamp / 1000d);
@@ -1636,13 +1658,9 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.POST;
-        UrlBuilder urlBuilder = new UrlBuilder()
-                .setProtocol(Urls.PROTOCOL)
-                .setHost(Urls.HOST)
-                .setPath(
-                        Urls.PATH_SERVICE.replace("%1", sensorId).replace("%2", serviceId) + "/"
-                                + methodName);
-        String url = urlBuilder.buildString();
+        String path = Urls.PATH_SERVICE.replace("%1", sensorId).replace("%2", serviceId) + "/"
+                + methodName;
+        String url = getApiUrl(path);
 
         // prepare request data
         JSONArray params = new JSONArray();
@@ -1664,7 +1682,7 @@ public class CommonSenseClient {
     public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
     }
-    
+
     /**
      * Add a user to a sensor, giving the user access to the sensor and data. Only the owner of the
      * sensor is able to upload data, mutate sensors and add users to their sensor. To add a user at
@@ -1686,9 +1704,8 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.POST;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_SENSOR_USERS.replace("%1", sensorId));
-        String url = urlBuilder.buildString();
+        String path = Urls.PATH_SENSOR_USERS.replace("%1", sensorId);
+        String url = getApiUrl(path);
 
         // prepare request data
         JSONObject user = new JSONObject();
@@ -1722,9 +1739,8 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.DELETE;
-        UrlBuilder urlBuilder = new UrlBuilder().setProtocol(Urls.PROTOCOL).setHost(Urls.HOST)
-                .setPath(Urls.PATH_SENSOR_USERS.replace("%1", sensorId) + "/" + userId);
-        String url = urlBuilder.buildString();
+        String path = Urls.PATH_SENSOR_USERS.replace("%1", sensorId) + "/" + userId;
+        String url = getApiUrl(path);
 
         // send request
         sendRequest(callback, method, url, sessionId);
