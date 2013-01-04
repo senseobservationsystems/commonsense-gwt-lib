@@ -718,7 +718,7 @@ public class CommonSenseClient {
 
         // prepare request properties
         Method method = RequestBuilder.POST;
-        String path = Urls.PATH_GROUPS;
+        String path = Urls.PATH_SENSORS;
         String url = getApiUrl(path);
 
         JSONObject sensor = new JSONObject();
