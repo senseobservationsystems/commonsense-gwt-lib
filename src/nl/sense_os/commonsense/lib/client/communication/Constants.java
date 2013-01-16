@@ -12,7 +12,8 @@ class Constants {
     /**
      * Flag for dev mode. <code>true</code> if the app is deployed to common.dev.sense-os.nl.
      */
-    public static final boolean DEV_MODE = GWT.getModuleBaseURL().contains("dev.sense-os.nl");
+    public static final boolean DEV_MODE = GWT.getModuleBaseURL()
+            .contains("common.dev.sense-os.nl");
 
     /**
      * Flag for Release Candidate mode. <code>true</code> if the app is deployed to rc.sense-os.nl.
