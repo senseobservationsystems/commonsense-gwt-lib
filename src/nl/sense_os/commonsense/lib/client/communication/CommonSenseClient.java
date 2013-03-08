@@ -14,6 +14,7 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestBuilder.Method;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.http.client.UrlBuilder;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONArray;
@@ -167,11 +168,12 @@ public class CommonSenseClient {
     private static void sendRequest(RequestCallback callback, Method method, String url,
             String sessionId, Map<String, String> formData) {
         try {
-            // put values in form urlencoded form
+            // put values in form URL encoded form
             String requestData = "";
             for (Entry<String, String> entry : formData.entrySet()) {
                 requestData += (requestData.length() > 0 ? "&" : "");
-                requestData += entry.getKey() + "=" + entry.getValue();
+                requestData += URL.encodeQueryString(entry.getKey()) + "="
+                        + URL.encodeQueryString(entry.getValue());
             }
 
             // prepare the request
