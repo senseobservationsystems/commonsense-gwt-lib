@@ -5,13 +5,12 @@ import java.util.List;
 
 import nl.sense_os.commonsense.lib.client.model.apiclass.Sensor;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 
 /**
  * Overlay for list of sensors sent from CommonSense back end using JSON.
  */
-public class GetSensorsResponse extends JavaScriptObject {
+public class GetSensorsResponse extends SenseApiResponse {
 
 	protected GetSensorsResponse() {
 		// empty protected constructor

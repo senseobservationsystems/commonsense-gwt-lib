@@ -5,10 +5,9 @@ import java.util.List;
 
 import nl.sense_os.commonsense.lib.client.model.apiclass.Environment;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 
-public class GetEnvironmentsResponse extends JavaScriptObject {
+public class GetEnvironmentsResponse extends SenseApiResponse {
 
 	protected GetEnvironmentsResponse() {
 		// empty protected constructor

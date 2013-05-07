@@ -5,10 +5,9 @@ import java.util.List;
 
 import nl.sense_os.commonsense.lib.client.model.apiclass.Group;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 
-public class GetGroupsResponse extends JavaScriptObject {
+public class GetGroupsResponse extends SenseApiResponse {
 
 	protected GetGroupsResponse() {
 		// empty protected constructor

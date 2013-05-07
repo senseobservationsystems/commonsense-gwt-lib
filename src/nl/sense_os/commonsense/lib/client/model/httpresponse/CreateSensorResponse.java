@@ -2,9 +2,7 @@ package nl.sense_os.commonsense.lib.client.model.httpresponse;
 
 import nl.sense_os.commonsense.lib.client.model.apiclass.Sensor;
 
-import com.google.gwt.core.client.JavaScriptObject;
-
-public class CreateSensorResponse extends JavaScriptObject {
+public class CreateSensorResponse extends SenseApiResponse {
 
 	protected CreateSensorResponse() {
 		// empty protected constructor

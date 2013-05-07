@@ -5,10 +5,9 @@ import java.util.List;
 
 import nl.sense_os.commonsense.lib.client.model.apiclass.Service;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 
-public class AvailServicesResponse extends JavaScriptObject {
+public class AvailServicesResponse extends SenseApiResponse {
 
 	protected AvailServicesResponse() {
 		// empty protected constructor

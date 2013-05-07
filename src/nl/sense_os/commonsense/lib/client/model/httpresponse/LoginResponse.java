@@ -1,8 +1,7 @@
 package nl.sense_os.commonsense.lib.client.model.httpresponse;
 
-import com.google.gwt.core.client.JavaScriptObject;
 
-public class LoginResponse extends JavaScriptObject {
+public class LoginResponse extends SenseApiResponse {
 
 	protected LoginResponse() {
 		// empty protected constructor
