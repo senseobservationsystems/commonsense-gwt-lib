@@ -17,3 +17,7 @@ war/WEB-INF/classes/
 
 .gwt/
 bin/
+
+# eclipse specific files
+.classpath
+.project
