@@ -31,7 +31,7 @@ public class CommonSenseClient {
 		private static final String PATH_PREFIX = Constants.GENERIC_MODE ? "" : "api/";
 		public static final String HOST = Constants.GENERIC_MODE ? "api.sense-os.nl"
 				: Window.Location.getHostName();
-		public static final String PROTOCOL = "http";
+		public static final String PROTOCOL = Window.Location.getProtocol();
 
 		// main paths
 		public static final String PATH_DOMAINS = PATH_PREFIX + "domains";
